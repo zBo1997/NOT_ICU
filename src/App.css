@@ -7,24 +7,8 @@
 }
 
 /* 让 html 和 body 占满整个页面 */
-html,
-body {
-  height: 100%;
-  /* 让 body 填充整个视口 */
-}
 
 /* 确保 #root 元素占满整个屏幕，并避免使用 flex */
 #root {
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-  /* 防止不必要的滚动 */
-  display: block;
-  /* 确保 #root 不使用 flex */
-}
 
-/* 让页面容器中的内容自适应 */
-#root>div {
-  height: 100%;
-  /* 保证根元素的第一个子元素占满视口 */
 }

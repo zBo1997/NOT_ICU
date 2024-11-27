@@ -10,6 +10,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { ModeToggle } from '@/components/mode-toggle'
 
 // Menu items.
 const items = [
@@ -45,7 +46,7 @@ export function AppSidebar() {
         <Sidebar>
             <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupLabel>Application</SidebarGroupLabel>
+                    <SidebarGroupLabel>ICU SELECTOR </SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {items.map((item) => (
@@ -62,6 +63,9 @@ export function AppSidebar() {
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
+            <div className="absolute bottom-4 left-0 w-full flex justify-center">
+                <ModeToggle />
+            </div>
         </Sidebar>
     )
 }
