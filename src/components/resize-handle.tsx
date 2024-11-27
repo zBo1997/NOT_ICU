@@ -28,23 +28,16 @@ export function ResizableCom() {
                     <ResizableHandle />
                     <SidebarTrigger />
                     {/* Content Panel */}
-                    <ResizablePanel defaultSize={90} className="relative overflow-y-auto h-full">
+                    <ResizablePanel defaultSize={90} className="overflow-y-auto">
                         {/* 使用 Grid 创建响应式布局 */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 h-full">
-                            {/* 第一列: 小屏幕时隐藏 */}
-                            <div className="hidden lg:block col-span-1 mt-auto">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-1 p-4">
+                            {/* 第一列: 一直展示 */}
+                            <div className="flex justify-center p-4 col-span-1">
                                 {/* 第一列 */}
-                                第一列的内容
-                            </div>
-
-                            {/* 第二列: 一直展示 */}
-                            <div className="flex items-center justify-center p-4 col-span-1">
-                                {/* 第二列 */}
                                 <PaginatedAccordion />
                             </div>
-
-                            {/* 第三列: 包含 CalendarCom */}
-                            <div className="relative flex items-center justify-end p-4">
+                            {/* 第二列: 包含 CalendarCom */}
+                            <div className="flex justify-end p-5">
                                 {/* 只在大屏幕下显示 CalendarCom */}
                                 <div className="hidden lg:block col-span-1 mt-auto">
                                     <CalendarCom />
