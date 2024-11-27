@@ -11,9 +11,10 @@ import { AppSidebar } from "@/components/app-sidebar"
 
 export function ResizableCom() {
     return (
-        <SidebarProvider>
+        <SidebarProvider
+        >
             <AppSidebar />
-            <main>
+            <main className="flex-grow">
                 <ResizablePanelGroup direction="vertical" className="rounded-lg overflow-auto">
                     {/* Header Panel */}
                     <ResizablePanel defaultSize={10}>
