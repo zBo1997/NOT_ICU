@@ -1,4 +1,9 @@
+import { CalendarCom } from "@/components/calendar-com";
 
 export function CalendarPage() {
-    return <h1>Calendar Page</h1>;
+    return (
+        <div>
+            <CalendarCom />
+        </div>
+    )
 }
