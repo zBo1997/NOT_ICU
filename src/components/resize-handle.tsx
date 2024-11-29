@@ -15,15 +15,15 @@ export function ResizableCom() {
             <AppSidebar />
             <main className="flex-grow">
                 <SidebarTrigger />
-                <div className="grid gap-1 p-10">
-                    <div className="text-2xl font-bold tracking-tight">
+                    <div className="flex flex-col flex-1">
+                        <div className="text-2xl font-bold tracking-tight p-10">
                         Don't ICU
                     </div>
                 </div>
                 {/* 使用 Grid 创建响应式布局 */}
-                <div className="grid lg:grid-cols-2 p-10">
+                    <div className="flex flex-col lg:flex-row">
                     {/* 第一列: 一直展示 */}
-                        <div className="">
+                        <div className="flex-1">
                             <Routes>
                                 <Route path="/" element={<HomePage />} />
                                 <Route path="/calendar" element={<CalendarPage />} />
@@ -34,7 +34,7 @@ export function ResizableCom() {
                     {/* 第二列: 包含 CalendarCom */}
                     <div className="flex justify-end">
                         {/* 只在大屏幕下显示 CalendarCom */}
-                        <div className="hidden lg:block col-span-1 mt-auto">
+                            <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end p-10">
                                 <CardCom />
                         </div>
                     </div>

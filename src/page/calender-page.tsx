@@ -2,7 +2,7 @@ import { CalendarCom } from "@/components/calendar-com";
 
 export function CalendarPage() {
     return (
-        <div>
+        <div className="flex">
             <CalendarCom />
         </div>
     )
