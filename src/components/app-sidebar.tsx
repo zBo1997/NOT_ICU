@@ -1,4 +1,5 @@
 import { Calendar, Home, Search, Settings } from "lucide-react"
+import { PopoverCom } from "@/components/pop-com";
 import { Link } from "react-router-dom";
 
 import {
@@ -59,6 +60,9 @@ export function AppSidebar() {
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
+            <div className="absolute bottom-20 left-0 w-full flex justify-center">
+                <PopoverCom />
+            </div>
             <div className="absolute bottom-4 left-0 w-full flex justify-center">
                 <ModeToggle />
             </div>
