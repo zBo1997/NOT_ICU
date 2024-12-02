@@ -19,7 +19,7 @@ export function ResizableCom() {
               Don't ICU
             </div>
           </div>
-          <div>
+          <div className="flex flex-1">
             {/* 使用 Grid 创建响应式布局 */}
             <div className="flex flex-1 flex-col lg:flex-row">
               {/* 第一列: 一直展示 */}
