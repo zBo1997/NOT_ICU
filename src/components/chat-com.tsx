@@ -72,7 +72,6 @@ export function ChatCard() {
           enterKeyHint="send"
           onKeyDown={(event) => event.key === "Enter" && sendMessage()}
         />
-        <Button onClick={sendMessage}>发送</Button>
       </CardFooter>
     </Card>
   );
