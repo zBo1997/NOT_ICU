@@ -18,12 +18,8 @@ type Message = {
 
 export function ChatCard() {
   const [messages, setMessages] = useState<Message[]>([]); // 消息历史
-  //   const [input, setInput] = useState(""); // 当前输入内容
   const msgRef = useRef<HTMLInputElement>(null);
 
-  const onKeyDown = (eve: React.KeyboardEvent<HTMLInputElement>) => {
-    if (eve.key === "Enter") sendMessage();
-  };
   // 发送消息
   const sendMessage = () => {
     const input = msgRef.current?.value ?? "";
@@ -44,11 +40,11 @@ export function ChatCard() {
   };
 
   return (
-    <Card className="w-full ">
+    <Card className="h-[100%] flex flex-col">
       <CardHeader>
         <CardTitle>ICU Chat</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4 h-[300px] overflow-y-auto">
+      <CardContent className="space-y-4 overflow-y-auto flex-1">
         {messages.map((message) => (
           <div
             key={message.id}
@@ -74,7 +70,7 @@ export function ChatCard() {
           placeholder="输入消息..."
           className="flex-1"
           enterKeyHint="send"
-          onKeyDown={onKeyDown}
+          onKeyDown={(event) => event.key === "Enter" && sendMessage()}
         />
         <Button onClick={sendMessage}>发送</Button>
       </CardFooter>
