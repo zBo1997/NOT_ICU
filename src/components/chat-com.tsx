@@ -35,9 +35,9 @@ export function ChatCard() {
     };
 
     return (
-        <Card className="w-full max-w-[500px] mx-auto">
+        <Card className="w-full ">
             <CardHeader>
-                <CardTitle>聊天界面</CardTitle>
+                <CardTitle>ICU Chat</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 h-[300px] overflow-y-auto">
                 {messages.map((message) => (
