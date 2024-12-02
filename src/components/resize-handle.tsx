@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Routes, Route, } from "react-router-dom";
 import { HomePage } from "@/page/home-page";
 import { SearchPage } from "@/page/search-page";
 import { SettingsPage } from "@/page/settings-page";
-import { CalendarPage } from "@/page/calender-page";
+import { ChatPage } from "@/page/chat-page";
 
 export function ResizableCom() {
     return (
@@ -26,7 +26,7 @@ export function ResizableCom() {
                         <div className="flex-1">
                             <Routes>
                                 <Route path="/" element={<HomePage />} />
-                                <Route path="/calendar" element={<CalendarPage />} />
+                                <Route path="/calendar" element={<ChatPage />} />
                                 <Route path="/search" element={<SearchPage />} />
                                 <Route path="/settings" element={<SettingsPage />} />
                             </Routes>
