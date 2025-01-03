@@ -1,4 +1,14 @@
+import { TableCom } from "@/components/table-com";
 
 export function SearchPage() {
-    return <h1 className="p-11">Search Page</h1>;
+    return (
+        
+            <div className="p-10">
+            <div className="text-2xl font-bold tracking-tight p-10">
+                {/* 这里打算留出面包屑功能 */}
+            </div>
+                {/* 插入 PaginatedAccordion */}
+                <TableCom />
+            </div>
+        );
 }
