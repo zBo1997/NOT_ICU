@@ -32,9 +32,12 @@ export function CardCom({ className, ...props }: CardProps) {
     return (
         <Card className={cn("w-[380px]", className)} {...props}>
             <CardHeader>
-                <CardTitle>热评：</CardTitle>
+                <CardTitle>实时热点：</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-5">
+                <p className="text-sm font-medium leading-none">
+                    "北京一程序员加班后在家脑出血.........."
+                </p>
                 <div className=" flex items-center space-x-4 rounded-md border p-4">
                     <div className="flex-1 space-y-1">
                         <p className="text-sm text-muted-foreground">

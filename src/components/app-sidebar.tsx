@@ -23,14 +23,14 @@ const items = [
         icon: Home,
     },
     {
-        title: "唠唠",
-        url: "/calendar",
-        icon: ChatBubbleIcon,
-    },
-    {
         title: "找点乐子",
         url: "/search",
         icon: Search,
+    },
+    {
+        title: "唠唠",
+        url: "/calendar",
+        icon: ChatBubbleIcon,
     },
     {
         title: "设置",

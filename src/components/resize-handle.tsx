@@ -21,8 +21,8 @@ export function ResizableCom() {
               <div className="flex-1 bg-red">
                 <Routes>
                   <Route path="/" element={<HomePage />} />
-                  <Route path="/calendar" element={<ChatPage />} />
                   <Route path="/search" element={<SearchPage />} />
+                  <Route path="/calendar" element={<ChatPage />} />
                   <Route path="/settings" element={<SettingsPage />} />
                 </Routes>
               </div>
