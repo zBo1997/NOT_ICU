@@ -2,7 +2,7 @@ import { useState } from "react";
 import { PaginationCom } from "@/components/pagination-content";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 const data = [
-    { title: "程序员如何缓解工作压力？", content: "保持规律作息，合理安排工作时间，避免过度加班。" },
+    { title: "北京一程序员加班后在家脑出血", content: "北京某一互联网公司加班导致一员工在家晕倒后脑出血。" },
     { title: "程序员常见的压力来源是什么？", content: "主要包括紧迫的项目截止日期、代码质量要求、快速变化的技术栈，以及与团队沟通的挑战。" },
     { title: "高强度编程对身体有什么影响？", content: "长期久坐和熬夜可能导致颈椎病、视力下降和疲劳过度等问题。" },
     { title: "程序员如何管理时间以减轻压力？", content: "使用工具规划任务，并将大任务拆解成小目标完成。" },
@@ -24,7 +24,7 @@ const data = [
 
 export function PaginatedAccordion() {
     const [currentPage, setCurrentPage] = useState<number>(1);
-    const itemsPerPage = 9; // 每页显示2个折叠面板
+    const itemsPerPage = 10; // 每页显示2个折叠面板
     const totalPages = Math.ceil(data.length / itemsPerPage); // 计算总页数
 
     // 当前页数据

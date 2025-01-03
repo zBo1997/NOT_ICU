@@ -1,4 +1,5 @@
-import { Calendar, Home, Search, Settings } from "lucide-react"
+import { Settings,Search,Home } from "lucide-react"
+import { ChatBubbleIcon } from "@radix-ui/react-icons"
 import { PopoverCom } from "@/components/pop-com";
 import { Link } from "react-router-dom";
 
@@ -17,22 +18,22 @@ import { ModeToggle } from '@/components/mode-toggle'
 // Menu items.
 const items = [
     {
-        title: "Home",
+        title: "主页",
         url: "/",
         icon: Home,
     },
     {
-        title: "Calendar",
+        title: "唠唠",
         url: "/calendar",
-        icon: Calendar,
+        icon: ChatBubbleIcon,
     },
     {
-        title: "Search",
+        title: "找点乐子",
         url: "/search",
         icon: Search,
     },
     {
-        title: "Settings",
+        title: "设置",
         url: "/settings",
         icon: Settings,
     },
@@ -43,7 +44,7 @@ export function AppSidebar() {
         <Sidebar>
             <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupLabel>ICU SELECTOR</SidebarGroupLabel>
+                    <SidebarGroupLabel>ICU</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {items.map((item) => (

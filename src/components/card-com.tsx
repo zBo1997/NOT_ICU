@@ -1,29 +1,28 @@
-import { BellRing, Check } from "lucide-react"
-
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
     Card,
     CardContent,
-    CardDescription,
     CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { Switch } from "@/components/ui/switch"
 
 const notifications = [
     {
-        title: "想睡",
-        description: "1 hour ago",
+        title: "Bot：",
+        description: "哎。资本家的嘴脸",
+        time: "2分钟前"
     },
     {
-        title: "那就睡",
-        description: "1 hour ago",
+        title: "虚拟网友A：",
+        description: "仲裁啊吧，让这些人收到应有的惩罚",
+        time: "2小时前"
     },
     {
-        title: "马上睡",
-        description: "2 hours ago",
+        title: "如意春风：",
+        description: "哎..开可恶",
+        time: "1小时前",
     },
 ]
 
@@ -33,35 +32,32 @@ export function CardCom({ className, ...props }: CardProps) {
     return (
         <Card className={cn("w-[380px]", className)} {...props}>
             <CardHeader>
-                <CardTitle>你好!</CardTitle>
-                <CardDescription>一定不要熬夜</CardDescription>
+                <CardTitle>热评：</CardTitle>
             </CardHeader>
-            <CardContent className="grid gap-4">
+            <CardContent className="grid gap-5">
                 <div className=" flex items-center space-x-4 rounded-md border p-4">
-                    <BellRing />
                     <div className="flex-1 space-y-1">
-                        <p className="text-sm font-medium leading-none">
-                            开启睡觉提醒
-                        </p>
                         <p className="text-sm text-muted-foreground">
-                            发送一个让你睡觉的通知到你设备上
+                            那出的不是血啊，是一个家庭的顶梁柱啊！
                         </p>
                     </div>
-                    <Switch />
                 </div>
                 <div>
                     {notifications.map((notification, index) => (
                         <div
                             key={index}
-                            className="mb-4 grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0"
+                            className="mb-4 grid grid-cols-[25px_1fr] items-start pb-3 last:mb-0 last:pb-0"
                         >
-                            <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
+                            <span className="flex h-3 w-3 translate-y-1 rounded-full bg-sky-500" />
                             <div className="space-y-1">
                                 <p className="text-sm font-medium leading-none">
                                     {notification.title}
                                 </p>
                                 <p className="text-sm text-muted-foreground">
                                     {notification.description}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                    {notification.time}
                                 </p>
                             </div>
                         </div>
@@ -70,7 +66,7 @@ export function CardCom({ className, ...props }: CardProps) {
             </CardContent>
             <CardFooter>
                 <Button className="w-full">
-                    <Check /> 老子知道了
+                    参与讨论
                 </Button>
             </CardFooter>
         </Card>

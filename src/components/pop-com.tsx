@@ -10,7 +10,7 @@ export function PopoverCom() {
     return (
         <Popover>
             <PopoverTrigger asChild>
-                <Button variant="outline">关于我</Button>
+                <Button variant="outline">登录</Button>
             </PopoverTrigger>
             <PopoverContent className="w-50">
                 <div className="grid gap-1">

@@ -14,11 +14,6 @@ export function ResizableCom() {
         <AppSidebar />
         <main className="flex flex-grow flex-col">
           <SidebarTrigger />
-          <div className="flex flex-col">
-            <div className="text-2xl font-bold tracking-tight p-10">
-              Don't ICU
-            </div>
-          </div>
           <div className="flex flex-1">
             {/* 使用 Grid 创建响应式布局 */}
             <div className="flex flex-1 flex-col lg:flex-row">
