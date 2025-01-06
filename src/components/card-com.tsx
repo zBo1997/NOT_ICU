@@ -7,6 +7,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
+import { SkeletonCom } from "./skeletion-com"
 
 const notifications = [
     {
@@ -31,6 +32,7 @@ type CardProps = React.ComponentProps<typeof Card>
 export function CardCom({ className, ...props }: CardProps) {
     return (
         <Card className={cn("w-[380px]", className)} {...props}>
+            <SkeletonCom/>
             <CardHeader>
                 <CardTitle>实时热点：</CardTitle>
             </CardHeader>
