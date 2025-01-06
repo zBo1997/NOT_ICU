@@ -5,49 +5,76 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { IdleCardCom } from "./idle-card-com";
+import { useState, useEffect, useRef } from "react";
 
 // 模拟通知数据
-const notifications = [
-  {
-    userName: "张三",
-    title: "任务更新",
-    description: "您有一个任务即将到期，请及时处理。",
-  },
-  {
-    userName: "李四",
-    title: "系统维护",
-    description: "系统将在今晚12点进行维护，请提前保存您的工作。",
-  },
-  {
-    userName: "王五",
-    title: "新消息",
-    description: "您有一条新的私信，请注意查收。",
-  },
-  {
-    userName: "赵六",
-    title: "会议提醒",
-    description: "明天下午3点，产品需求讨论会议，请准时参加。",
-  },
-  {
-    userName: "孙七",
-    title: "密码更改",
-    description: "您的密码已成功更改，如非本人操作请尽快联系管理员。",
-  },
-];
+const allNotifications = Array.from({ length: 50 }, (_, i) => ({
+  userName: `用户 ${i + 1}`,
+  title: `通知标题 ${i + 1}`,
+  description: `这是通知的描述信息 ${i + 1}。`,
+}));
 
-// 渲染 Table 组件
+const PAGE_SIZE = 10;
+
 export function TableCom() {
+  const [notifications, setNotifications] = useState(allNotifications.slice(0, PAGE_SIZE));
+  const [page, setPage] = useState(1);
+  const loaderRef = useRef<HTMLDivElement | null>(null);
+
+  // 监听滚动事件
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const target = entries[0];
+        if (target.isIntersecting) {
+          loadMoreData();
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    if (loaderRef.current) {
+      observer.observe(loaderRef.current);
+    }
+
+    return () => {
+      if (loaderRef.current) {
+        observer.unobserve(loaderRef.current);
+      }
+    };
+  }, [page]);
+
+  // 模拟加载更多数据
+  const loadMoreData = () => {
+    const nextPage = page + 1;
+    const newNotifications = allNotifications.slice(0, nextPage * PAGE_SIZE);
+
+    if (newNotifications.length > notifications.length) {
+      setNotifications(newNotifications);
+      setPage(nextPage);
+    }
+  };
+
   return (
-    <Table>
-      <TableBody>
-        {notifications.map((notification, index) => (
-          <TableRow key={index}>
-            <TableCell className="font-medium">
-              <IdleCardCom notification={notification} />
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+    <div className="overflow-y-auto max-h-[600px]" style={{
+      /* 隐藏滚动条 */
+      scrollbarWidth: 'none',  /* Firefox */
+      msOverflowStyle: 'none',  /* Internet Explorer */
+    }}>
+      <Table>
+        <TableBody>
+          {notifications.map((notification, index) => (
+            <TableRow key={index}>
+              <TableCell className="font-medium">
+                <IdleCardCom notification={notification} />
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      <div ref={loaderRef} className="py-4 text-center">
+        {notifications.length < allNotifications.length ? "加载更多..." : "---我是有底线的---"}
+      </div>
+    </div>
   );
 }
