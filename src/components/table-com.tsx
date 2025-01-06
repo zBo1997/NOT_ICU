@@ -9,6 +9,7 @@ import { useState, useEffect, useRef } from "react";
 
 // 模拟通知数据
 const allNotifications = Array.from({ length: 50 }, (_, i) => ({
+  avatarUrl: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
   userName: `用户 ${i + 1}`,
   title: `通知标题 ${i + 1}`,
   description: `这是通知的描述信息 ${i + 1}。`,
@@ -56,7 +57,7 @@ export function TableCom() {
   };
 
   return (
-    <div className="overflow-y-auto max-h-[600px]" style={{
+    <div className="overflow-y-auto max-h-[650px]" style={{
       /* 隐藏滚动条 */
       scrollbarWidth: 'none',  /* Firefox */
       msOverflowStyle: 'none',  /* Internet Explorer */

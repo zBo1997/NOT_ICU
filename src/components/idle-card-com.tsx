@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils"
+import { AvatarCom } from '@/components/avatar-com';
 import {
   Card,
   CardContent,
@@ -7,9 +8,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { SheetCom } from "./sheet-com";
 
 
 type Notification = {
+    avatarUrl: string,
     userName: string;
     title: string;
     description: string;
@@ -17,16 +20,19 @@ type Notification = {
 
 type CardProps = React.ComponentProps<typeof Card> & {
     notification?: Notification;
-  };
+};
 
 export function IdleCardCom({ className, 
     notification,
     ...props}: CardProps) {
+  const avatarUrl = notification?.avatarUrl || "default-avatar.png"; // default image
+  const userName = notification?.userName || "Unknown User"; // default name
   return (
     <Card className={cn("", className)} {...props}>
       <CardHeader>
         <CardTitle>
-        <div>
+        <AvatarCom avatarInfo={{ userName, avatarUrl }} className="mt-1"/>
+        <div className="mt-3">
             {notification?.userName}
         </div>
         </CardTitle>
@@ -40,6 +46,7 @@ export function IdleCardCom({ className,
             >
               <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
               <div className="space-y-1">
+         
                 <p className="text-sm font-medium leading-none">
                   {notification?.title}
                 </p>
@@ -52,6 +59,7 @@ export function IdleCardCom({ className,
         </div>
       </CardContent>
       <CardFooter>
+      <SheetCom/>
       </CardFooter>
     </Card>
   )
