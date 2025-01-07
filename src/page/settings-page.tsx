@@ -11,8 +11,6 @@ export function SettingsPage() {
       {/* 个人信息卡片 */}
       <InfoCardCom/>
 
-
-
       {/* 其他部分 */}
       <div className="mt-12 space-y-4">
         {/* 这里可以添加更多的个人信息，如邮箱、地址等 */}

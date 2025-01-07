@@ -3,10 +3,10 @@ import { AvatarCom } from '@/components/avatar-com';
 import {
   Card,
   CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+  CardFooter
 } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+
 
 type Notification = {
     avatarUrl: string,
@@ -43,19 +43,18 @@ export function InfoCardCom({ className,
           <h3 className="text-xl">馍 馍</h3>
           <p className="text-sm mt-2">我清楚的记得人与人的路是不可复制的</p>
         </div>
-
-        {/* 修改信息按钮 */}
-        <div className="flex justify-center space-x-4">
-          <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-            修改资料
-          </button>
-          <button className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
-            更改密码
-          </button>
-        </div>
       </div>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="flex flex-col items-center space-y-4">
+        {/* 修改信息按钮 */}
+        <div className="flex justify-center space-x-4">
+          <Button>
+            修改资料
+          </Button>
+          <Button>
+            更改密码
+          </Button>
+        </div>
       </CardFooter>
     </Card>
   )
