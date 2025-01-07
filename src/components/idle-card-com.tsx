@@ -31,7 +31,7 @@ export function IdleCardCom({ className,
     <Card className={cn("", className)} {...props}>
       <CardHeader>
         <CardTitle>
-        <AvatarCom avatarInfo={{ userName, avatarUrl }} className="mt-1"/>
+        <AvatarCom avatarInfo={{ userName, avatarUrl }} size="lg" className="mt-1"/>
         <div className="mt-3">
             {notification?.userName}
         </div>
