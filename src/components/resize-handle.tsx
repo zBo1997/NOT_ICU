@@ -18,7 +18,7 @@ export function ResizableCom() {
             {/* 使用 Grid 创建响应式布局 */}
             <div className="flex flex-1 flex-col lg:flex-row">
               {/* 第一列: 一直展示 */}
-              <div className="flex-1 bg-red">
+              <div className="flex-1">
                 <Routes>
                   <Route path="/" element={<HomePage />} />
                   <Route path="/search" element={<SearchPage />} />
