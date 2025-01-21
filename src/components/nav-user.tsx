@@ -12,6 +12,7 @@ import {
 
 import { PersonIcon } from "@radix-ui/react-icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useNavigateTo } from "@/utils/navigation"; // 导入路由工具方法
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,19 +39,27 @@ export function NavUser({
     avatar: string;
   };
 }) {
+  const { navigateTo } = useNavigateTo();
   const { isMobile } = useSidebar();
-  const handleLogin = () => {
-    const user = {
-      name: "User Name",
-      email: "zhubo@example.com",
-      avatar: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
-    };
-    localStorage.setItem("user", JSON.stringify(user));
-    window.location.reload(); // 重新加载页面
-  };
+
+  // // 登录
+  // const handleLogin = () => {
+  //   const user = {
+  //     name: "User Name",
+  //     email: "zhubo@example.com",
+  //     avatar: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
+  //   };
+  //   localStorage.setItem("user", JSON.stringify(user));
+  //   window.location.reload(); // 重新加载页面
+  // };
   const handleLogout = () => {
     localStorage.removeItem("user");
     window.location.reload(); // 重新加载页面
+  };
+
+  // 跳转到登录页面
+  const goToLoginPage = () => {
+    navigateTo("/login");
   };
 
   if (!user) {
@@ -65,7 +74,7 @@ export function NavUser({
               >
                 <div className="flex items-center justify-center space-x-2">
                   <PersonIcon />
-                  <span className="">赶快加入ICU吧,感受这个世界吧</span>
+                  <span className="">赶快加入ICU吧,感受新世界吧~</span>
                 </div>
               </SidebarMenuButton>
             </DropdownMenuTrigger>
@@ -81,7 +90,7 @@ export function NavUser({
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogin}>
+              <DropdownMenuItem onClick={goToLoginPage}>
                 <LogIn />登 录
               </DropdownMenuItem>
             </DropdownMenuContent>
