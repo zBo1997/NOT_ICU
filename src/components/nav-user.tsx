@@ -7,8 +7,10 @@ import {
   //   Sparkles,
   ChevronsUpDown,
   LogOut,
+  LogIn,
 } from "lucide-react";
 
+import { PersonIcon } from "@radix-ui/react-icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -40,7 +42,7 @@ export function NavUser({
   const handleLogin = () => {
     const user = {
       name: "User Name",
-      email: "user@example.com",
+      email: "zhubo@example.com",
       avatar: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
     };
     localStorage.setItem("user", JSON.stringify(user));
@@ -52,40 +54,41 @@ export function NavUser({
   };
 
   if (!user) {
-    <SidebarMenu>
-      <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <SidebarMenuButton
+                size="lg"
+                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              >
+                <div className="flex items-center justify-center space-x-2">
+                  <PersonIcon />
+                  <span className="">赶快加入ICU吧,感受这个世界吧</span>
+                </div>
+              </SidebarMenuButton>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+              side={isMobile ? "bottom" : "right"}
+              align="end"
+              sideOffset={4}
             >
-              <div className="flex items-center justify-center space-x-2">
-                <span className="text-sm" onClick={handleLogin}>
-                  登录
-                </span>
-              </div>
-            </SidebarMenuButton>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-            side={isMobile ? "bottom" : "right"}
-            align="end"
-            sideOffset={4}
-          >
-            <DropdownMenuLabel className="p-0 font-normal">
-              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <span className="truncate">请登录以访问账户</span>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <span>Log in</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </SidebarMenuItem>
-    </SidebarMenu>;
+              <DropdownMenuLabel className="p-0 font-normal">
+                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                  <span className="truncate">已有账号?登录以访问账户</span>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogin}>
+                <LogIn />登 录
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    );
   }
   return (
     <SidebarMenu>
@@ -149,8 +152,7 @@ export function NavUser({
             </DropdownMenuGroup> */}
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
-              <LogOut />
-              Log out
+              <LogOut />注 销
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

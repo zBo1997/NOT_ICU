@@ -17,13 +17,10 @@ import {
 import { ModeToggle } from "@/components/mode-toggle";
 import { NavUser } from "@/components/nav-user";
 
-const data = {
-  user: {
-    id: "1",
-    name: "Momo",
-    email: "zhuzhuxia19970224@gmail.com",
-    avatar: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
-  },
+// 获取用户信息
+const getUser = () => {
+  const user = localStorage.getItem("user");
+  return user ? JSON.parse(user) : null;
 };
 
 // Menu items.
@@ -51,12 +48,14 @@ const items = [
 ];
 
 export function AppSidebar() {
+  const user = getUser(); // 获取用户信息
+
   return (
     <Sidebar>
-      <SidebarHeader />
+      <SidebarHeader>NOT'ICU</SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>ICU</SidebarGroupLabel>
+          <SidebarGroupLabel></SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
@@ -79,7 +78,7 @@ export function AppSidebar() {
         <ModeToggle />
       </div>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
     </Sidebar>
   );
