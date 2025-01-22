@@ -40,8 +40,16 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar();
 
+  //注销
   const handleLogout = () => {
     localStorage.removeItem("user");
+    window.location.reload(); // 重新加载页面
+  };
+
+  //登录
+  const handleLogin = () => {
+    console.log("登录");
+    localStorage.setItem("register", "true");
     window.location.reload(); // 重新加载页面
   };
 
@@ -73,7 +81,7 @@ export function NavUser({
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogin}>
                 <LogIn />登 录
               </DropdownMenuItem>
             </DropdownMenuContent>

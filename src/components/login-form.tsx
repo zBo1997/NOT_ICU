@@ -8,7 +8,7 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  // 登录
+  // 登录 TODO
   const handleLogin = () => {
     const user = {
       name: "User Name",
@@ -95,9 +95,9 @@ export function LoginForm({
                 </Button>
               </div> */}
               <div className="text-center text-sm">
-                没有账号?注册一个~{" "}
+                没有账号?~{" "}
                 <a href="#" className="underline underline-offset-4">
-                  注册一个ICU
+                  注册一个ICU账号
                 </a>
               </div>
             </div>
