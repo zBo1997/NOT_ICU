@@ -12,7 +12,6 @@ import {
 
 import { PersonIcon } from "@radix-ui/react-icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useNavigateTo } from "@/utils/navigation"; // 导入路由工具方法
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,27 +38,11 @@ export function NavUser({
     avatar: string;
   };
 }) {
-  const { navigateTo } = useNavigateTo();
   const { isMobile } = useSidebar();
 
-  // // 登录
-  // const handleLogin = () => {
-  //   const user = {
-  //     name: "User Name",
-  //     email: "zhubo@example.com",
-  //     avatar: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
-  //   };
-  //   localStorage.setItem("user", JSON.stringify(user));
-  //   window.location.reload(); // 重新加载页面
-  // };
   const handleLogout = () => {
     localStorage.removeItem("user");
     window.location.reload(); // 重新加载页面
-  };
-
-  // 跳转到登录页面
-  const goToLoginPage = () => {
-    navigateTo("/login");
   };
 
   if (!user) {
@@ -90,7 +73,7 @@ export function NavUser({
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={goToLoginPage}>
+              <DropdownMenuItem>
                 <LogIn />登 录
               </DropdownMenuItem>
             </DropdownMenuContent>

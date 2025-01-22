@@ -6,25 +6,8 @@ import { HomePage } from "@/page/home-page";
 import { SearchPage } from "@/page/search-page";
 import { SettingsPage } from "@/page/settings-page";
 import { ChatPage } from "@/page/chat-page";
-import { LoginForm } from "@/components/login-form";
 
 export function ResizableCom() {
-  // 获取用户信息
-  const getUser = () => {
-    const user = localStorage.getItem("user");
-    return user ? JSON.parse(user) : null;
-  };
-
-  const user = getUser();
-  if (!user) {
-    return (
-      <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
-        <div className="w-full max-w-sm md:max-w-3xl">
-          <LoginForm />
-        </div>
-      </div>
-    );
-  }
   return (
     <Router>
       <SidebarProvider>
