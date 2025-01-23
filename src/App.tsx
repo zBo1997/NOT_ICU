@@ -20,8 +20,8 @@ function App() {
 
   const user = getUser();
   const register = getRegister();
-  // 登录页面
-  if (!user && register) {
+  // 登录页面 没有用户或者没有打开注册按钮
+  if (!user && !register) {
     return (
       <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
         <div className="w-full max-w-sm md:max-w-3xl">
@@ -30,7 +30,7 @@ function App() {
       </div>
     );
   }
-  //注册页面
+  //注册页面 需要展示注册页面
   if (register) {
     return (
       <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">

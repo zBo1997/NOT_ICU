@@ -48,7 +48,6 @@ export function NavUser({
 
   //登录
   const handleLogin = () => {
-    console.log("登录");
     localStorage.setItem("register", "true");
     window.location.reload(); // 重新加载页面
   };

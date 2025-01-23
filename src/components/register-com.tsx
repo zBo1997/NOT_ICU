@@ -19,6 +19,13 @@ export function RegisterForm({
     window.location.reload(); // 重新加载页面
   };
 
+  //登录
+  const toLogin = () => {
+    localStorage.removeItem("register");
+    localStorage.removeItem("user");
+    window.location.reload(); // 重新加载页面
+  };
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden">
@@ -96,7 +103,11 @@ export function RegisterForm({
               </div> */}
               <div className="text-center text-sm">
                 已有账号?{" "}
-                <a href="#" className="underline underline-offset-4">
+                <a
+                  href="#"
+                  className="underline underline-offset-4"
+                  onClick={toLogin}
+                >
                   点击这里登录
                 </a>
               </div>
