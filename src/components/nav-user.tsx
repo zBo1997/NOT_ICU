@@ -29,15 +29,9 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-export function NavUser({
-  user,
-}: {
-  user: {
-    name: string;
-    email: string;
-    avatar: string;
-  };
-}) {
+import { User } from "@/common/user-context";
+
+export function NavUser({ user }: { user: User | null }) {
   const { isMobile } = useSidebar();
 
   //注销

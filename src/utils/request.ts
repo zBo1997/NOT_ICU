@@ -1,8 +1,10 @@
 import axios, { AxiosRequestConfig } from "axios";
 
+const baseUrl = process.env.REACT_APP_API_BASE_URL;
+
 // 创建 axios 实例
 const api = axios.create({
-  baseURL: "https://your-api-url.com", // 替换为你的 API 基础地址
+  baseURL: baseUrl,
   headers: {
     "Content-Type": "application/json",
   },

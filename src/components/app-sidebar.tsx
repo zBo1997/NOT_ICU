@@ -16,13 +16,7 @@ import {
 } from "@/components/ui/sidebar";
 import { ModeToggle } from "@/components/mode-toggle";
 import { NavUser } from "@/components/nav-user";
-
-// 获取用户信息
-const getUser = () => {
-  const user = localStorage.getItem("user");
-  return user ? JSON.parse(user) : null;
-};
-
+import { UserProvider } from "@/common/user-context";
 // Menu items.
 const items = [
   {
@@ -48,7 +42,7 @@ const items = [
 ];
 
 export function AppSidebar() {
-  const user = getUser(); // 获取用户信息
+  const user = UserProvider();
 
   return (
     <Sidebar>
