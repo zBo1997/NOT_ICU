@@ -6,8 +6,9 @@ import { Label } from "@/components/ui/label";
 
 export function LoginForm({
   className,
+  register,
   ...props
-}: React.ComponentProps<"div"> & { setRegister: () => void }) {
+}: React.ComponentProps<"div"> & { register: () => void }) {
   // 登录 TODO
   const handleLogin = () => {
     const user = {
@@ -21,7 +22,7 @@ export function LoginForm({
 
   const toRegister = () => {
     //调用父组件传递的 setRegister 方法
-    props.setRegister();
+    register();
   };
 
   return (
