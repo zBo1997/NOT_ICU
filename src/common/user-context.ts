@@ -1,8 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 
-const REGISTER_KEY = "register"
-
-const USER_KEY = "register"
+const USER_KEY = "user"
 
 export interface User {
     name: string;
@@ -29,18 +27,6 @@ export function UserProvider() {
         }
     }, []);
     return user;
-}
-
-export function RegisterProvider() {
-    const [register, setRegister] = useState<User | null>(null);
-
-    useEffect(() => {
-        const storedUser = localStorage.getItem(REGISTER_KEY);
-        if (storedUser) {
-            setRegister(JSON.parse(storedUser));
-        }
-    }, []);
-    return register;
 }
 
 export function useUserContext() {
