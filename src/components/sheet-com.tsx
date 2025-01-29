@@ -18,6 +18,12 @@ const topic = {
   title: "程序员加班的后果",
   description:
     "最近有新闻报道，一名程序员因为加班导致在家脑出血，引发了社会广泛讨论。你怎么看？",
+  images: [
+    "https://picx.zhimg.com/v2-a096c2cd85dfcecba81581f6bfad8411_r.jpg?source=2c26e567",
+    "https://picx.zhimg.com/v2-a096c2cd85dfcecba81581f6bfad8411_r.jpg?source=2c26e567",
+    "https://picx.zhimg.com/v2-a096c2cd85dfcecba81581f6bfad8411_r.jpg?source=2c26e567",
+    "https://picx.zhimg.com/v2-a096c2cd85dfcecba81581f6bfad8411_r.jpg?source=2c26e567",
+  ], // 最多3张图片
 };
 
 // 模拟已有评论数据
@@ -39,6 +45,24 @@ const existingComments = [
 export function SheetCom() {
   const [commentText, setCommentText] = useState("");
   const [comments, setComments] = useState(existingComments);
+
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false); // 控制预览弹窗
+  const [currentImage, setCurrentImage] = useState<string>("");
+
+  // 打开预览模态框
+  const handleImageClick = (image: string) => {
+    setCurrentImage(image);
+    setIsPreviewOpen(true);
+  };
+
+  // 关闭预览模态框
+  const handleClosePreview = () => {
+    setIsPreviewOpen(false);
+  };
+
+  const closeWindow = () => {
+    handleClosePreview();
+  };
 
   // 处理评论提交
   const handleCommentSubmit = () => {
@@ -63,7 +87,38 @@ export function SheetCom() {
         <SheetHeader>
           <SheetTitle>{topic.title}</SheetTitle>
           <SheetDescription>{topic.description}</SheetDescription>
+          {/* 显示讨论话题的图片 */}
+          <div className="mt-4  justify-center flex space-x-2">
+            {topic.images.map((image, index) => (
+              <img
+                key={index}
+                src={image}
+                alt={`话题图片 ${index + 1}`}
+                className="h-20 w-20 object-cover rounded-md"
+                onClick={() => handleImageClick(image)}
+              />
+            ))}
+          </div>
         </SheetHeader>
+
+        {/* 预览模态框 */}
+        {isPreviewOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
+            <div className="relative max-w-3xl max-h-[90vh] w-full h-full flex justify-center items-center">
+              <img
+                src={currentImage}
+                alt="图片预览"
+                className="w-full h-full object-contain"
+              />
+              <button
+                onClick={handleClosePreview}
+                className="absolute top-2 right-2 text-white bg-black bg-opacity-50 p-2 rounded-full"
+              >
+                x
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="space-y-6 py-4">
           {/* 评论输入框 */}
@@ -120,7 +175,9 @@ export function SheetCom() {
 
         <SheetFooter>
           <SheetClose asChild>
-            <Button type="submit">关闭</Button>
+            <Button type="submit" onClick={closeWindow}>
+              关闭
+            </Button>
           </SheetClose>
         </SheetFooter>
       </SheetContent>
