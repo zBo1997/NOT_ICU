@@ -1,28 +1,39 @@
-name: NodeJS with Gulp
+name: NOT_ICU
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main # 或者你想要监听的分支，如 master 或 develop
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main # 如果你希望在提交 PR 时也触发
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x, 22.x]
-
     steps:
-    - uses: actions/checkout@v4
+    # 检出代码
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
+    # 设置 Node.js 环境
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: '20'  # 使用你项目中需要的 Node.js 版本
 
-    - name: Build
-      run: |
-        npm install
-        gulp
+    # 安装依赖
+    - name: Install dependencies
+      run: npm install
+
+    # 构建 Vite 项目
+    - name: Build project
+      run: npm run build
+
+    # 上传构建的 dist 目录作为 artifact
+    - name: Upload dist directory as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: dist
+        path: dist/
