@@ -16,6 +16,10 @@ function App() {
     setRegister(true); // 点击时更新 register 状态为 true
   };
 
+  const toLogin = () => {
+    setRegister(false); // 点击时更新 register 状态为 false
+  };
+
   // 登录页面 没有用户或者没有打开注册按钮
   if (!user && !register) {
     return (
@@ -31,7 +35,7 @@ function App() {
     return (
       <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
         <div className="w-full max-w-sm md:max-w-3xl">
-          <RegisterForm />
+          <RegisterForm register={toLogin} />
         </div>
       </div>
     );

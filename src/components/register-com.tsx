@@ -6,8 +6,9 @@ import { Label } from "@/components/ui/label";
 
 export function RegisterForm({
   className,
+  register,
   ...props
-}: React.ComponentProps<"div">) {
+}: React.ComponentProps<"div"> & { register: () => void }) {
   // 注册
   const handleRegister = () => {
     const user = {
@@ -16,14 +17,13 @@ export function RegisterForm({
       avatar: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
     };
     localStorage.setItem("user", JSON.stringify(user));
-    window.location.reload(); // 重新加载页面
+    window.location.reload(); // 重新加载页面true
   };
 
   //登录
   const toLogin = () => {
-    localStorage.removeItem("register");
     localStorage.removeItem("user");
-    window.location.reload(); // 重新加载页面
+    register(); // 调用父组件传递的 setRegister 方法
   };
 
   return (
