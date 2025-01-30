@@ -3,20 +3,36 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useRef } from "react";
+import { post } from "@/utils/request"; // 引入刚刚写的请求工具类
 
 export function LoginForm({
   className,
   register,
   ...props
 }: React.ComponentProps<"div"> & { register: () => void }) {
+  // 使用 ref 来获取输入框值
+  const emailRef = useRef<HTMLInputElement | null>(null);
+  const passwordRef = useRef<HTMLInputElement | null>(null);
   // 登录 TODO
-  const handleLogin = () => {
-    const user = {
-      name: "User Name",
-      email: "zhubo@example.com",
-      avatar: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
-    };
-    localStorage.setItem("user", JSON.stringify(user));
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault(); // 阻止表单默认提交
+
+    // 获取表单输入值
+    const email = emailRef.current?.value;
+    const password = passwordRef.current?.value;
+
+    const response = await post<{ token: string }>("login", {
+      email,
+      password,
+    });
+    console.log(response);
+    // const user = {
+    //   name: "User Name",
+    //   email: "zhubo@example.com",
+    //   avatar: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
+    // };
+    // localStorage.setItem("user", JSON.stringify(user));
     window.location.reload(); // 重新加载页面
   };
 
@@ -44,6 +60,7 @@ export function LoginForm({
                   type="email"
                   placeholder="请输入你的账号"
                   required
+                  ref={emailRef} // 使用 ref 来获取值
                 />
               </div>
               <div className="grid gap-2">
@@ -61,6 +78,7 @@ export function LoginForm({
                   type="password"
                   placeholder="请输入你的密码"
                   required
+                  ref={passwordRef}
                 />
               </div>
               <Button type="submit" className="w-full" onClick={handleLogin}>

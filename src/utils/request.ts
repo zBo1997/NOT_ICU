@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
 
-const baseUrl = process.env.REACT_APP_API_BASE_URL;
+const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
 // 创建 axios 实例
 const api = axios.create({
