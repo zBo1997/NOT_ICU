@@ -3,12 +3,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useRef } from "react";
 
 export function RegisterForm({
   className,
   register,
   ...props
 }: React.ComponentProps<"div"> & { register: () => void }) {
+  // 使用 ref 来获取输入框值
+  const emailRef = useRef<HTMLInputElement | null>(null);
+  const passwordRef = useRef<HTMLInputElement | null>(null);
   // 注册
   const handleRegister = () => {
     const user = {
@@ -45,6 +49,7 @@ export function RegisterForm({
                   type="email"
                   placeholder="请输入你的账号"
                   required
+                  ref={emailRef} // 使用 ref 来获取值
                 />
               </div>
               <div className="grid gap-2">
@@ -62,6 +67,7 @@ export function RegisterForm({
                   type="password"
                   placeholder="请输入你的密码"
                   required
+                  ref={passwordRef} // 使用 ref 来获取值
                 />
               </div>
               <Button type="submit" className="w-full" onClick={handleRegister}>

@@ -37,6 +37,10 @@ api.interceptors.response.use(
         // 例如未授权，跳转到登录页
         window.location.href = "/login";
       }
+      if (error.response.status === 500) {
+        // 例如服务器错误，显示错误提示
+        console.error("服务器错误: ", error.response.data);
+      }
     } else {
       console.error("请求失败: ", error.message);
     }

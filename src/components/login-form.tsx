@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRef } from "react";
 import { post } from "@/utils/request"; // 引入刚刚写的请求工具类
+import { useAlert } from "@/context/alert-context"; // 导入 useAlert
 
 export function LoginForm({
   className,
@@ -14,6 +15,7 @@ export function LoginForm({
   // 使用 ref 来获取输入框值
   const emailRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
+  const { showAlert } = useAlert(); // 获取 showAlert 方法
   // 登录 TODO
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault(); // 阻止表单默认提交
@@ -22,18 +24,22 @@ export function LoginForm({
     const email = emailRef.current?.value;
     const password = passwordRef.current?.value;
 
-    const response = await post<{ token: string }>("login", {
-      email,
-      password,
-    });
-    console.log(response);
-    // const user = {
-    //   name: "User Name",
-    //   email: "zhubo@example.com",
-    //   avatar: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
-    // };
-    // localStorage.setItem("user", JSON.stringify(user));
-    window.location.reload(); // 重新加载页面
+    try {
+      const response = await post<{ token: string }>("login", {
+        email,
+        password,
+      });
+      if (response.status != 200) {
+        showAlert("登录失败", "用户名或密码错误"); // 登录失败弹出警告
+        return;
+      }
+      // 如果登录成功，可以保存 token 或用户信息到本地
+      window.location.reload(); // 重新加载页面
+    } catch (error) {
+      showAlert("登录失败", "用户名或密码错误"); // 登录失败弹出警告
+      console.log(error);
+      return;
+    }
   };
 
   const toRegister = () => {

@@ -7,6 +7,7 @@ import { LoginForm } from "@/components/login-form";
 import { RegisterForm } from "@/components/register-com";
 import { UserProvider } from "@/common/user-context";
 import { useState } from "react";
+import { AlertProvider } from "@/context/alert-context"; // 导入 AlertProvider
 
 function App() {
   const user = UserProvider();
@@ -41,13 +42,15 @@ function App() {
     );
   }
 
-  return (
-    <>
-      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-        <ResizableCom />
-      </ThemeProvider>
-    </>
-  );
+  return <ResizableCom />;
 }
 
-export default App
+export default function AppWrapper() {
+  return (
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <AlertProvider>
+        <App />
+      </AlertProvider>
+    </ThemeProvider>
+  );
+}
