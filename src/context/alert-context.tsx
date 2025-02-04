@@ -53,6 +53,7 @@ export const AlertProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAlert = () => {
   const context = useContext(AlertContext);
   if (!context) {

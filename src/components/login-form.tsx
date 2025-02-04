@@ -36,7 +36,7 @@ export function LoginForm({
       // 如果登录成功，可以保存 token 或用户信息到本地
       window.location.reload(); // 重新加载页面
     } catch (error) {
-      showAlert("登录失败", "用户名或密码错误"); // 登录失败弹出警告
+      showAlert("登录失败", "服务器出小差了"); // 登录失败弹出警告
       console.log(error);
       return;
     }

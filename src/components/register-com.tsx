@@ -4,6 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRef } from "react";
+import { post } from "@/utils/request"; // 引入刚刚写的请求工具类
+import { useAlert } from "@/context/alert-context"; // 导入 useAlert
 
 export function RegisterForm({
   className,
@@ -13,15 +15,34 @@ export function RegisterForm({
   // 使用 ref 来获取输入框值
   const emailRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
+  const usernameRef = useRef<HTMLInputElement | null>(null);
+  const { showAlert } = useAlert(); // 获取 showAlert 方法
   // 注册
-  const handleRegister = () => {
-    const user = {
-      name: "User Name",
-      email: "zhubo@example.com",
-      avatar: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
-    };
-    localStorage.setItem("user", JSON.stringify(user));
-    window.location.reload(); // 重新加载页面true
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault(); // 阻止表单默认提交
+
+    // 获取表单输入值
+    const email = emailRef.current?.value;
+    const password = passwordRef.current?.value;
+    const username = usernameRef.current?.value;
+    try {
+      const response = await post<{ token: string }>("register", {
+        email,
+        password,
+        username,
+      });
+      console.log(response.status);
+      if (response.status != 200) {
+        showAlert("注册失败", "请稍后重试"); // 登录失败弹出警告
+        return;
+      }
+      // 如果登录成功，可以保存 token 或用户信息到本地
+      window.location.reload(); // 重新加载页面
+    } catch (error) {
+      showAlert("注册失败", "服务器出小差了"); // 登录失败弹出警告
+      console.log(error);
+      return;
+    }
   };
 
   //登录
@@ -68,6 +89,22 @@ export function RegisterForm({
                   placeholder="请输入你的密码"
                   required
                   ref={passwordRef} // 使用 ref 来获取值
+                />
+              </div>
+              <div className="grid gap-2">
+                <div className="flex items-center">
+                  <Label htmlFor="password">昵称</Label>
+                  <a
+                    href="#"
+                    className="ml-auto text-sm underline-offset-2 hover:underline"
+                  >
+                    你的名字
+                  </a>
+                </div>
+                <Input
+                  placeholder="请输入你的密码"
+                  required
+                  ref={usernameRef} // 使用 ref 来获取值
                 />
               </div>
               <Button type="submit" className="w-full" onClick={handleRegister}>
