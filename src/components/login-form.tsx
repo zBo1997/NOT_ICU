@@ -6,35 +6,37 @@ import { Label } from "@/components/ui/label";
 import { useRef } from "react";
 import { post } from "@/utils/request"; // 引入刚刚写的请求工具类
 import { useAlert } from "@/context/alert-context"; // 导入 useAlert
-
 export function LoginForm({
   className,
   register,
   ...props
 }: React.ComponentProps<"div"> & { register: () => void }) {
   // 使用 ref 来获取输入框值
-  const emailRef = useRef<HTMLInputElement | null>(null);
+  const usernameRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
   const { showAlert } = useAlert(); // 获取 showAlert 方法
   // 登录 TODO
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault(); // 阻止表单默认提交
-
     // 获取表单输入值
-    const email = emailRef.current?.value;
+    const username = usernameRef.current?.value;
     const password = passwordRef.current?.value;
 
     try {
       const response = await post<{ token: string }>("login", {
-        email,
+        username,
         password,
       });
-      if (response.status != 200) {
+      console.log(response.data.token);
+      if (!response.data.token) {
         showAlert("登录失败", "用户名或密码错误"); // 登录失败弹出警告
         return;
+      } else {
+        //设置用户信息
+        localStorage.setItem("user", JSON.stringify(response.data)); // 保存用户信息
+        // 如果登录成功，可以保存 token 或用户信息到本地
+        window.location.reload(); // 重新加载页面
       }
-      // 如果登录成功，可以保存 token 或用户信息到本地
-      window.location.reload(); // 重新加载页面
     } catch (error) {
       showAlert("登录失败", "服务器出小差了"); // 登录失败弹出警告
       console.log(error);
@@ -62,11 +64,11 @@ export function LoginForm({
               <div className="grid gap-2">
                 <Label htmlFor="email">账户</Label>
                 <Input
-                  id="email"
-                  type="email"
+                  id="username"
+                  type="text"
                   placeholder="请输入你的账号"
                   required
-                  ref={emailRef} // 使用 ref 来获取值
+                  ref={usernameRef} // 使用 ref 来获取值
                 />
               </div>
               <div className="grid gap-2">

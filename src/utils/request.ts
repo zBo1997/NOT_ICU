@@ -27,7 +27,9 @@ api.interceptors.request.use(
 
 // 响应拦截器，可以在收到响应后处理一些逻辑
 api.interceptors.response.use(
-  (response) => response.data, // 只返回数据部分
+  (response) => {
+    return response.data;
+  }, // 只返回数据部分
   (error) => {
     // 错误处理
     if (error.response) {

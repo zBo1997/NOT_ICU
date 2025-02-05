@@ -13,26 +13,26 @@ export function RegisterForm({
   ...props
 }: React.ComponentProps<"div"> & { register: () => void }) {
   // 使用 ref 来获取输入框值
-  const emailRef = useRef<HTMLInputElement | null>(null);
-  const passwordRef = useRef<HTMLInputElement | null>(null);
   const usernameRef = useRef<HTMLInputElement | null>(null);
+  const passwordRef = useRef<HTMLInputElement | null>(null);
+  const nicknameRef = useRef<HTMLInputElement | null>(null);
   const { showAlert } = useAlert(); // 获取 showAlert 方法
   // 注册
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault(); // 阻止表单默认提交
 
     // 获取表单输入值
-    const email = emailRef.current?.value;
-    const password = passwordRef.current?.value;
     const username = usernameRef.current?.value;
+    const password = passwordRef.current?.value;
+    const name = nicknameRef.current?.value;
     try {
       const response = await post<{ token: string }>("register", {
-        email,
+        name,
         password,
         username,
       });
-      console.log(response.status);
-      if (response.status != 200) {
+      console.log(response);
+      if (response.data) {
         showAlert("注册失败", "请稍后重试"); // 登录失败弹出警告
         return;
       }
@@ -70,7 +70,7 @@ export function RegisterForm({
                   type="email"
                   placeholder="请输入你的账号"
                   required
-                  ref={emailRef} // 使用 ref 来获取值
+                  ref={usernameRef} // 使用 ref 来获取值
                 />
               </div>
               <div className="grid gap-2">
@@ -104,7 +104,7 @@ export function RegisterForm({
                 <Input
                   placeholder="请输入你的密码"
                   required
-                  ref={usernameRef} // 使用 ref 来获取值
+                  ref={nicknameRef} // 使用 ref 来获取值
                 />
               </div>
               <Button type="submit" className="w-full" onClick={handleRegister}>
