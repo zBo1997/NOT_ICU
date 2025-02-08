@@ -1,29 +1,11 @@
-import { cn } from "@/lib/utils"
-import { AvatarCom } from '@/components/avatar-com';
-import {
-  Card,
-  CardContent,
-  CardFooter
-} from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { AvatarCom } from "@/components/avatar-com";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { User } from "@/common/user-context";
 
-
-type Notification = {
-    avatarUrl: string,
-    userName: string;
-    title: string;
-    description: string;
-    imageUrl :string 
-};
-
-type CardProps = React.ComponentProps<typeof Card> & {
-    notification?: Notification;
-};
-
-export function InfoCardCom({ className, 
-    ...props}: CardProps) {
+export function InfoCardCom({ user }: { user: User | null }) {
   return (
-    <Card className={cn("", className)} {...props}>
+    <Card>
       <CardContent className="rounded-xl p-8 space-y-6">
         {/* 个人信息卡片 */}
         <div>
@@ -31,9 +13,8 @@ export function InfoCardCom({ className,
           <div className="flex justify-center">
             <AvatarCom
               avatarInfo={{
-                userName: "用户名称",
-                avatarUrl:
-                  "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
+                userName: user?.name || "",
+                avatarUrl: `http://localhost:8080/api/file/${user?.avatar}`,
               }}
               size="lg"
               className="mt-1"
@@ -41,8 +22,8 @@ export function InfoCardCom({ className,
           </div>
           {/* 用户名和简介 */}
           <div className="text-center">
-            <h3 className="text-xl">馍 馍</h3>
-            <p className="text-sm mt-2">我清楚的记得人与人的路是不可复制的</p>
+            <h3 className="text-xl">{user?.name}</h3>
+            <p className="text-sm mt-2">{user?.signature}</p>
           </div>
         </div>
       </CardContent>

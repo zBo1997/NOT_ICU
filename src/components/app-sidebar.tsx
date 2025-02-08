@@ -20,17 +20,17 @@ import { UserProvider } from "@/common/user-context";
 // Menu items.
 const items = [
   {
-    title: "主页",
+    title: "热榜",
     url: "/",
     icon: Home,
   },
   {
-    title: "找点乐子",
+    title: "荟萃",
     url: "/search",
     icon: Search,
   },
   {
-    title: "唠唠",
+    title: "AI识货",
     url: "/calendar",
     icon: ChatBubbleIcon,
   },

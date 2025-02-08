@@ -26,14 +26,17 @@ export function RegisterForm({
     const password = passwordRef.current?.value;
     const name = nicknameRef.current?.value;
     try {
-      const response = await post<{ token: string }>("register", {
+      const response = await post<{
+        error: string;
+        errorContent: string;
+      }>("register", {
         name,
         password,
         username,
       });
       console.log(response);
-      if (response.data) {
-        showAlert("注册失败", "请稍后重试"); // 登录失败弹出警告
+      if (response.data.error) {
+        showAlert(response.data.error, response.data.errorContent); // 登录失败弹出警告
         return;
       }
       // 如果登录成功，可以保存 token 或用户信息到本地
@@ -80,7 +83,7 @@ export function RegisterForm({
                     href="#"
                     className="ml-auto text-sm underline-offset-2 hover:underline"
                   >
-                    英文组合至少8位
+                    请不要过于简单
                   </a>
                 </div>
                 <Input
@@ -98,7 +101,7 @@ export function RegisterForm({
                     href="#"
                     className="ml-auto text-sm underline-offset-2 hover:underline"
                   >
-                    你的名字
+                    你的ICU昵称
                   </a>
                 </div>
                 <Input

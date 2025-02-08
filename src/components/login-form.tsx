@@ -23,13 +23,16 @@ export function LoginForm({
     const password = passwordRef.current?.value;
 
     try {
-      const response = await post<{ token: string }>("login", {
+      const response = await post<{
+        error: string;
+        errorContent: string;
+        token: string;
+      }>("login", {
         username,
         password,
       });
-      console.log(response.data.token);
-      if (!response.data.token) {
-        showAlert("登录失败", "用户名或密码错误"); // 登录失败弹出警告
+      if (response.data.error) {
+        showAlert(response.data.error, response.data.errorContent); // 登录失败弹出警告
         return;
       } else {
         //设置用户信息

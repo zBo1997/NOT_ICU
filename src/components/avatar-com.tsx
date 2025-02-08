@@ -41,14 +41,9 @@ export function AvatarCom({
     };
 
     return (
-        <Avatar
-            className={`${sizeClasses[size]} ${className}`}
-            {...props}
-        >
-            <AvatarImage src={avatarUrl} alt={userName} />
-            <AvatarFallback>
-                {getInitials(userName)}
-            </AvatarFallback>
-        </Avatar>
+      <Avatar className={`${sizeClasses[size]} ${className}`} {...props}>
+        <AvatarImage src={avatarUrl} alt={userName} />
+        <AvatarFallback>{getInitials(userName)}</AvatarFallback>
+      </Avatar>
     );
 }
