@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress"; // 引入进度条组件
+import { postFormData } from "@/utils/request"; // 引入你的请求工具类
 
 type AvatarInfo = {
   userName: string;
@@ -21,10 +22,13 @@ export function AvatarUploadCom({
   ...props
 }: AvatarProps) {
   const userName = avatarInfo?.userName || "用户";
-  const [avatarUrl, setAvatarUrl] = useState(avatarInfo?.avatarUrl || "");
+  const [avatarUrl, setAvatarUrl] =
+    useState(
+      avatarInfo?.avatarUrl ||
+        JSON.parse(localStorage.getItem("user") || "{}").avatar
+    ) || "";
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0); // 上传进度
-
   // 生成用户名首字母
   const getInitials = (name: string) => {
     return name
@@ -42,30 +46,46 @@ export function AvatarUploadCom({
     lger: "w-48 h-48", // 更大号尺寸 48px
   };
 
-  // 处理头像上传（模拟上传）
+  // 处理头像上传（使用 axios 工具类进行文件上传）
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setIsUploading(true);
       setUploadProgress(0); // 重置进度条
 
-      // 模拟上传过程
-      const interval = setInterval(() => {
-        setUploadProgress((prev) => {
-          if (prev >= 100) {
-            clearInterval(interval);
-            // 模拟返回新的头像 URL
-            const newAvatarUrl = URL.createObjectURL(file);
-            setAvatarUrl(newAvatarUrl);
-            if (onAvatarChange) {
-              onAvatarChange(newAvatarUrl); // 调用回调函数传递新头像 URL
-            }
-            setIsUploading(false);
-            return 100; // 确保进度条是100%
+      const formData = new FormData();
+      formData.append("file", file);
+
+      // 使用 axios 发送文件上传请求
+      postFormData<{ filekey: string }>("/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data", // 设置为表单数据类型
+          Authorization: `${
+            JSON.parse(localStorage.getItem("user") || "{}").token
+          }`,
+        },
+        onUploadProgress: (progressEvent) => {
+          if (progressEvent.total) {
+            const percent = Math.round(
+              (progressEvent.loaded / progressEvent.total) * 100
+            );
+            setUploadProgress(percent); // 更新进度
           }
-          return prev + 10; // 每次增加10%的进度
+        },
+      })
+        .then((response) => {
+          const avatarKey = response.data.filekey; //如果成更则返回
+          setAvatarUrl(avatarKey);
+          if (onAvatarChange) {
+            onAvatarChange(avatarKey); // 调用回调函数传递新头像 URL
+          }
+        })
+        .catch((error) => {
+          console.error("头像上传失败", error);
+        })
+        .finally(() => {
+          setIsUploading(false);
         });
-      }, 500); // 每500ms更新一次进度
     }
   };
 
@@ -73,21 +93,20 @@ export function AvatarUploadCom({
     <div className="relative flex flex-col items-center">
       {/* 上传中状态（可选），显示进度条在头像上方 */}
       {isUploading && (
-        <div className="absolute left-full mr-2 transform -translate-y-1/2 w-24">
+        <div className="absolute w-full max-w-[200px] bottom-full">
           <Progress value={uploadProgress} className="w-full" />
-          <div className="text-center text-sm mt-2 text-gray-500">
-            {Math.round(uploadProgress)}% 上传中...
-          </div>
         </div>
       )}
-
       {/* 头像展示区域 */}
       <Avatar
         className={`${sizeClasses[size]} ${className}`}
         {...props}
         onClick={() => document.getElementById("avatar-upload")?.click()} // 点击头像时触发上传
       >
-        <AvatarImage src={avatarUrl} alt={userName} />
+        <AvatarImage
+          src={`http://localhost:8080/api/file/${avatarUrl}`}
+          alt={userName}
+        />
         <AvatarFallback>{getInitials(userName)}</AvatarFallback>
       </Avatar>
 
@@ -95,7 +114,8 @@ export function AvatarUploadCom({
       <input
         id="avatar-upload"
         type="file"
-        className="absolute inset-0 opacity-0"
+        title="请选择头像"
+        className="absolute inset-0 opacity-0 cursor-pointer"
         onChange={handleAvatarChange}
       />
     </div>

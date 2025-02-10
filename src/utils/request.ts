@@ -65,6 +65,11 @@ export const put = <T>(url: string, data: Record<string, unknown>, config?: Axio
   return api.put<T>(url, data, config);
 };
 
+// 可提交formData的POST请求
+export const postFormData = <T>(url: string, data: FormData, config?: AxiosRequestConfig) => {
+  return api.post<T>(url, data, config);
+};
+
 export const del = <T>(url: string, config?: AxiosRequestConfig) => {
   return api.delete<T>(url, config);
 };

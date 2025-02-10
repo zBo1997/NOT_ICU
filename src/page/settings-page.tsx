@@ -6,12 +6,9 @@ export function SettingsPage() {
 
   return (
     <div className="p-10">
+      {/* 页面标题 */}
+      <div className="text-3xl font-semibold tracking-tight mb-6">个人信息</div>
       <InfoCardCom user={user}>
-        {/* 页面标题 */}
-        <div className="text-3xl font-semibold tracking-tight mb-6">
-          个人信息
-        </div>
-
         {/* 其他部分 */}
         <div className="mt-12 space-y-4">
           {/* 联系方式 */}

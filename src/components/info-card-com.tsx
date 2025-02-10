@@ -20,7 +20,12 @@ export function InfoCardCom({
             <AvatarUploadCom
               avatarInfo={{
                 userName: user?.name || "",
-                avatarUrl: `http://localhost:8080/api/file/${user?.avatar}`,
+                avatarUrl: user?.avatar || "",
+              }}
+              onAvatarChange={(newAvatarUrl) => {
+                // 更新用户信息
+                // 这里只是模拟更新用户信息，实际项目中需要调用接口
+                user!.avatar = newAvatarUrl;
               }}
               size="lg"
               className="mt-1"
