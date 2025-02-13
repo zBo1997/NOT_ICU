@@ -20,7 +20,7 @@ import { UserProvider } from "@/common/user-context";
 // Menu items.
 const items = [
   {
-    title: "热榜",
+    title: "热卖单品",
     url: "/",
     icon: Home,
   },
@@ -46,7 +46,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-      <SidebarHeader>NOT'ICU</SidebarHeader>
+      <SidebarHeader>ICU</SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel></SidebarGroupLabel>
