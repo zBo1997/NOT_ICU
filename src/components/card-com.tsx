@@ -21,7 +21,7 @@ export function CardCom({ className, ...props }: CardProps) {
         <CarouselCom />
       </CardContent>
       <CardFooter>
-        <Button className="w-full">参与讨论</Button>
+        <Button className="w-full">找找同款</Button>
       </CardFooter>
     </Card>
   );
