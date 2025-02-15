@@ -94,7 +94,7 @@ export function NavUser({ user }: { user: User | null }) {
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage
-                  src={`https://theta.icu/api/file/${user.avatar}`}
+                  src={`https://theta.icu/file/${user.avatar}`}
                   alt={user.name}
                 />
                 <AvatarFallback className="rounded-lg">CN</AvatarFallback>

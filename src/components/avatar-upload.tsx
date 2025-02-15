@@ -105,7 +105,7 @@ export function AvatarUploadCom({
         onClick={() => document.getElementById("avatar-upload")?.click()} // 点击头像时触发上传
       >
         <AvatarImage
-          src={`https://theta.icu/api/file/${avatarUrl}`}
+          src={`https://theta.icu/file/${avatarUrl}`}
           alt={userName}
         />
         <AvatarFallback>{getInitials(userName)}</AvatarFallback>
