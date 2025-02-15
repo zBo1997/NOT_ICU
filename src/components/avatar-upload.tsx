@@ -77,6 +77,7 @@ export function AvatarUploadCom({
           const avatarKey = response.data.filekey; //如果成更则返回
           setAvatarUrl(avatarKey);
           if (onAvatarChange) {
+            console.log("头像上传成功", avatarKey);
             onAvatarChange(avatarKey); // 调用回调函数传递新头像 URL
           }
         })

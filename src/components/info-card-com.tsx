@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { User } from "@/common/user-context";
 import { AvatarUploadCom } from "@/components/avatar-upload";
 import { useAlert } from "@/context/alert-context"; // 导入 useAlert
-import { post } from "@/utils/request"; // 引入刚刚写的请求工具类
+import { postFormData } from "@/utils/request"; // 引入刚刚写的请求工具类
 export function InfoCardCom({
   user,
   children,
@@ -25,25 +25,33 @@ export function InfoCardCom({
                 avatarUrl: user?.avatar || "",
               }}
               onAvatarChange={async (newAvatarUrl) => {
-                // 更新用户信息
-                // 这里只是模拟更新用户信息，实际项目中需要调用接口
+                console.log("更新头像" + newAvatarUrl);
+                const formData = new FormData();
+                formData.append("userId", user?.id || "");
+                formData.append("avatar", newAvatarUrl || "");
                 user!.avatar = newAvatarUrl;
-                // 更新用户头像
                 try {
-                  const response = await post<{
+                  const response = await postFormData<{
                     error: string;
                     errorContent: string;
-                    token: string;
-                  }>("updateUser", {
-                    user,
+                    imgKey: string;
+                  }>("/updateAvatar", formData, {
+                    headers: {
+                      "Content-Type": "multipart/form-data", // 设置为表单数据类型
+                      Authorization: `${
+                        JSON.parse(localStorage.getItem("user") || "{}").token
+                      }`,
+                    },
                   });
                   if (response.data.error) {
                     showAlert(response.data.error, response.data.errorContent); // 更新失败弹出警告
                     return;
                   } else {
-                    //设置用户信息
-                    localStorage.setItem("user", JSON.stringify(response.data)); // 保存用户信息
-                    // 如果更新成功，可以保存 token 或用户信息到本地
+                    const imgKey = response.data.imgKey;
+                    console.log("更新成功" + imgKey);
+                    // 更新用户头像逻辑，例如更新用户信息或重新加载页面
+                    user!.avatar = imgKey;
+                    localStorage.setItem("user", JSON.stringify(user)); // 保存用户信息
                     window.location.reload(); // 重新加载页面
                   }
                 } catch (error) {

@@ -3,6 +3,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 const USER_KEY = "user"
 
 export interface User {
+    id: string;
     name: string;
     email: string;
     avatar: string;
