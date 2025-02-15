@@ -94,7 +94,7 @@ export function NavUser({ user }: { user: User | null }) {
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage
-                  src={`http://localhost:8080/api/file/${user.avatar}`}
+                  src={`http://127.0.0.1:8080/api/file/${user.avatar}`}
                   alt={user.name}
                 />
                 <AvatarFallback className="rounded-lg">CN</AvatarFallback>
@@ -116,7 +116,7 @@ export function NavUser({ user }: { user: User | null }) {
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage
-                    src={`http://localhost:8080/api/file/${user.avatar}`}
+                    src={`http://127.0.0.1:8080/api/file/${user.avatar}`}
                     alt={user.name}
                   />
                   <AvatarFallback className="rounded-lg">CN</AvatarFallback>
