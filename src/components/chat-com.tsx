@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -19,6 +19,7 @@ type Message = {
 export function ChatCard() {
   const [messages, setMessages] = useState<Message[]>([]); // 消息历史
   const msgRef = useRef<HTMLInputElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null); // 用于获取内容区域的 DOM 元素
 
   // 发送消息
   const sendMessage = () => {
@@ -39,12 +40,41 @@ export function ChatCard() {
     msgRef.current!.value = "";
   };
 
+  // 监听 messages 的变化，滚动到底部
+  useEffect(() => {
+    if (contentRef.current) {
+      contentRef.current.scrollTop = contentRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  // 监听服务器推送的消息
+  useEffect(() => {
+    const eventSource = new EventSource("api/sse");
+
+    eventSource.onmessage = (event) => {
+      const newMessage = event.data; // 获取服务器推送的消息
+      setMessages((prevMessages) => [...prevMessages, newMessage]); // 更新消息列表
+    };
+
+    eventSource.onerror = () => {
+      console.error("SSE connection error");
+      eventSource.close();
+    };
+
+    return () => {
+      eventSource.close(); // 组件卸载时关闭连接
+    };
+  }, []);
+
   return (
-    <Card className="h-[100%] flex flex-col">
+    <Card className="max-h-[80vh] flex flex-col">
+      {/* 头部 */}
       <CardHeader>
         <CardTitle>ICU Chat</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4 overflow-y-auto flex-1">
+
+      {/* 消息内容区域 */}
+      <CardContent ref={contentRef} className="flex-1 overflow-y-auto">
         {messages.map((message) => (
           <div
             key={message.id}
@@ -64,6 +94,8 @@ export function ChatCard() {
           </div>
         ))}
       </CardContent>
+
+      {/* 输入框和按钮 */}
       <CardFooter className="flex space-x-2">
         <Input
           ref={msgRef}
