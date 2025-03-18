@@ -30,9 +30,10 @@ export function ChatCard() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const msgRef = useRef<HTMLInputElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const eventSourceRef = useRef<EventSource | null>(null); // 用于管理 SSE 连接
 
   // 发送消息
-  const sendMessage = () => {
+  const sendMessage = async () => {
     const input = msgRef.current?.value ?? "";
     if (!input.trim()) return;
 
@@ -56,19 +57,42 @@ export function ChatCard() {
       return [...prevConversations, newConversation];
     });
 
+    // 清空输入框
     msgRef.current!.value = "";
+
+    // 关闭当前 SSE 连接
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+      eventSourceRef.current = null;
+    }
+
+    // 通知后端用户发送了新消息
+    try {
+      await fetch("/api/sendMessage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          conversationId: userMessage.conversationId,
+          content: userMessage.content,
+        }),
+      });
+    } catch (error) {
+      console.error("发送消息失败:", error);
+    }
+
+    // 重新建立 SSE 连接
+    establishSSEConnection(userMessage.conversationId);
   };
 
-  // 监听消息变化，滚动到底部
-  useEffect(() => {
-    if (contentRef.current) {
-      contentRef.current.scrollTop = contentRef.current.scrollHeight;
+  // 建立 SSE 连接
+  const establishSSEConnection = (conversationId: string) => {
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+      eventSourceRef.current = null;
     }
-  }, [conversations]);
 
-  // 监听服务器推送的消息
-  useEffect(() => {
-    const eventSource = new EventSource("api/sse");
+    const eventSource = new EventSource(`/api/sse/${conversationId}`);
+    eventSourceRef.current = eventSource;
 
     eventSource.onmessage = (event) => {
       const newMessage: Message = JSON.parse(event.data);
@@ -117,10 +141,25 @@ export function ChatCard() {
       console.error("SSE connection error");
       eventSource.close();
     };
+  };
+
+  // 监听消息变化，滚动到底部
+  useEffect(() => {
+    if (contentRef.current) {
+      contentRef.current.scrollTop = contentRef.current.scrollHeight;
+    }
+  }, [conversations]);
+
+  // 初始化 SSE 连接
+  useEffect(() => {
+    // 假设初始对话 ID 为 "init"
+    establishSSEConnection("init");
 
     // 组件卸载时关闭连接
     return () => {
-      eventSource.close();
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+      }
     };
   }, []);
 
