@@ -25,7 +25,6 @@ export function InfoCardCom({
                 avatarUrl: user?.avatar || "",
               }}
               onAvatarChange={async (newAvatarUrl) => {
-                console.log("更新头像" + newAvatarUrl);
                 const formData = new FormData();
                 formData.append("userId", user?.id || "");
                 formData.append("avatar", newAvatarUrl || "");

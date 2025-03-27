@@ -10,16 +10,20 @@ import { useState, useEffect, useRef } from "react";
 // 模拟通知数据
 const allNotifications = Array.from({ length: 50 }, (_, i) => ({
   avatarUrl: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
-  userName: `用户名称 ${i + 1}`,
+  userName: `送你离开 ${i + 1}`,
   title: `标题,标题,标题,标题,标题,标题,标题,标题,标题,标题 ${i + 1}`,
-  description: `这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息 ${i + 1}。`,
+  description: `这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息 ${
+    i + 1
+  }。`,
   imageUrl: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
 }));
 
 const PAGE_SIZE = 10;
 
 export function TableCom() {
-  const [notifications, setNotifications] = useState(allNotifications.slice(0, PAGE_SIZE));
+  const [notifications, setNotifications] = useState(
+    allNotifications.slice(0, PAGE_SIZE)
+  );
   const [page, setPage] = useState(1);
   const loaderRef = useRef<HTMLDivElement | null>(null);
 
@@ -58,11 +62,14 @@ export function TableCom() {
   };
 
   return (
-    <div className="overflow-y-auto max-h-[650px]" style={{
-      /* 隐藏滚动条 */
-      scrollbarWidth: 'none',  /* Firefox */
-      msOverflowStyle: 'none',  /* Internet Explorer */
-    }}>
+    <div
+      className="overflow-y-auto max-h-[650px]"
+      style={{
+        /* 隐藏滚动条 */
+        scrollbarWidth: "none" /* Firefox */,
+        msOverflowStyle: "none" /* Internet Explorer */,
+      }}
+    >
       <Table>
         <TableBody>
           {notifications.map((notification, index) => (
@@ -75,7 +82,9 @@ export function TableCom() {
         </TableBody>
       </Table>
       <div ref={loaderRef} className="py-4 text-center">
-        {notifications.length < allNotifications.length ? "加载更多..." : "---我是有底线的---"}
+        {notifications.length < allNotifications.length
+          ? "加载更多..."
+          : "---我是有底线的---"}
       </div>
     </div>
   );

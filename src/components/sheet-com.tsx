@@ -15,11 +15,9 @@ import { AvatarCom } from "@/components/avatar-com";
 
 // 模拟讨论话题数据
 const topic = {
-  title: "程序员加班的后果",
-  description:
-    "最近有新闻报道，一名程序员因为加班导致在家脑出血，引发了社会广泛讨论。你怎么看？",
+  title: "加班问题引发社会关注，你怎么看？",
+  description: "",
   images: [
-    "https://picx.zhimg.com/v2-a096c2cd85dfcecba81581f6bfad8411_r.jpg?source=2c26e567",
     "https://picx.zhimg.com/v2-a096c2cd85dfcecba81581f6bfad8411_r.jpg?source=2c26e567",
     "https://picx.zhimg.com/v2-a096c2cd85dfcecba81581f6bfad8411_r.jpg?source=2c26e567",
     "https://picx.zhimg.com/v2-a096c2cd85dfcecba81581f6bfad8411_r.jpg?source=2c26e567",
@@ -32,6 +30,30 @@ const existingComments = [
     userName: "Alice",
     comment: "这是一个很严重的警告！希望公司能考虑员工的身心健康。",
     time: "2分钟前",
+    avatarUrl: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
+  },
+  {
+    userName: "Bob",
+    comment: "我也觉得加班问题越来越严重，作为程序员，压力真的很大。",
+    time: "10分钟前",
+    avatarUrl: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
+  },
+  {
+    userName: "Bob",
+    comment: "我也觉得加班问题越来越严重，作为程序员，压力真的很大。",
+    time: "10分钟前",
+    avatarUrl: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
+  },
+  {
+    userName: "Bob",
+    comment: "我也觉得加班问题越来越严重，作为程序员，压力真的很大。",
+    time: "10分钟前",
+    avatarUrl: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
+  },
+  {
+    userName: "Bob",
+    comment: "我也觉得加班问题越来越严重，作为程序员，压力真的很大。",
+    time: "10分钟前",
     avatarUrl: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
   },
   {
@@ -83,7 +105,7 @@ export function SheetCom() {
       <SheetTrigger asChild>
         <Button variant="outline">参与讨论</Button>
       </SheetTrigger>
-      <SheetContent className="w-full max-w-lg">
+      <SheetContent className="w-full max-w-xl overflow-y-auto">
         <SheetHeader>
           <SheetTitle>{topic.title}</SheetTitle>
           <SheetDescription>{topic.description}</SheetDescription>

@@ -1,4 +1,4 @@
-import { Settings,Search,Home } from "lucide-react"
+import { Settings, Search } from "lucide-react";
 import { ChatBubbleIcon } from "@radix-ui/react-icons";
 import { Link } from "react-router-dom";
 
@@ -19,18 +19,18 @@ import { NavUser } from "@/components/nav-user";
 import { UserProvider } from "@/common/user-context";
 // Menu items.
 const items = [
-  {
-    title: "热卖单品",
-    url: "/",
-    icon: Home,
-  },
+  // {
+  //   title: "热卖单品",
+  //   url: "/",
+  //   icon: Home,
+  // },
   {
     title: "荟萃",
-    url: "/search",
+    url: "/",
     icon: Search,
   },
   {
-    title: "AI识货",
+    title: "唠唠",
     url: "/calendar",
     icon: ChatBubbleIcon,
   },
