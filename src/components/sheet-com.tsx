@@ -12,53 +12,42 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { AvatarCom } from "@/components/avatar-com";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism"; // 选择一款主题
 
 // 模拟讨论话题数据
 const topic = {
-  title: "加班问题引发社会关注，你怎么看？",
-  description: "",
+  title: "Go中的协程到底是怎么实现的？",
+  description: "Go语言中的协程是如何实现的？为什么它这么快？",
+  content: `首先我们来看一个Go协程示例：
+\`\`\`go
+package main
+
+import "fmt"
+
+func main() {
+  go func() {
+    fmt.Println("这是一个协程")
+  }()
+}
+\`\`\`
+这是解释说明部分`,
   images: [
     "https://picx.zhimg.com/v2-a096c2cd85dfcecba81581f6bfad8411_r.jpg?source=2c26e567",
-    "https://picx.zhimg.com/v2-a096c2cd85dfcecba81581f6bfad8411_r.jpg?source=2c26e567",
-    "https://picx.zhimg.com/v2-a096c2cd85dfcecba81581f6bfad8411_r.jpg?source=2c26e567",
-  ], // 最多3张图片
+  ], // 最多1张图片
 };
 
 // 模拟已有评论数据
 const existingComments = [
   {
     userName: "Alice",
-    comment: "这是一个很严重的警告！希望公司能考虑员工的身心健康。",
+    comment: "这样代码的很直观，易懂",
     time: "2分钟前",
     avatarUrl: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
   },
   {
     userName: "Bob",
-    comment: "我也觉得加班问题越来越严重，作为程序员，压力真的很大。",
-    time: "10分钟前",
-    avatarUrl: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
-  },
-  {
-    userName: "Bob",
-    comment: "我也觉得加班问题越来越严重，作为程序员，压力真的很大。",
-    time: "10分钟前",
-    avatarUrl: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
-  },
-  {
-    userName: "Bob",
-    comment: "我也觉得加班问题越来越严重，作为程序员，压力真的很大。",
-    time: "10分钟前",
-    avatarUrl: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
-  },
-  {
-    userName: "Bob",
-    comment: "我也觉得加班问题越来越严重，作为程序员，压力真的很大。",
-    time: "10分钟前",
-    avatarUrl: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
-  },
-  {
-    userName: "Bob",
-    comment: "我也觉得加班问题越来越严重，作为程序员，压力真的很大。",
+    comment: "的确，我也这么认为",
     time: "10分钟前",
     avatarUrl: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
   },
@@ -108,20 +97,54 @@ export function SheetCom() {
       <SheetContent className="w-full max-w-xl overflow-y-auto">
         <SheetHeader>
           <SheetTitle>{topic.title}</SheetTitle>
-          <SheetDescription>{topic.description}</SheetDescription>
           {/* 显示讨论话题的图片 */}
-          <div className="mt-4  justify-center flex space-x-2">
+          <div className="mt-4  justify-center flex space-x-10">
             {topic.images.map((image, index) => (
               <img
                 key={index}
                 src={image}
                 alt={`话题图片 ${index + 1}`}
-                className="h-20 w-20 object-cover rounded-md"
+                className="object-cover rounded-md"
                 onClick={() => handleImageClick(image)}
               />
             ))}
           </div>
+          <SheetDescription>{topic.description}</SheetDescription>
         </SheetHeader>
+        <div className="content space-y-4">
+          {(() => {
+            //判断是否是代码块
+            const parts = topic.content.split(/(```[\s\S]+?```)/g);
+            return parts.map((part, i) => {
+              if (part.startsWith("```") && part.endsWith("```")) {
+                const [language, ...codeLines] = part
+                  .replace(/```/g, "")
+                  .trim()
+                  .split("\n");
+                const code = codeLines.join("\n");
+                return (
+                  <SyntaxHighlighter
+                    language={language || "text"}
+                    style={atomDark}
+                    key={`code-${i}`}
+                    customStyle={{
+                      borderRadius: "0.5rem",
+                      margin: "1rem 0",
+                      fontSize: "14px",
+                    }}
+                  >
+                    {code}
+                  </SyntaxHighlighter>
+                );
+              }
+              return (
+                <p key={`text-${i}`} className="whitespace-pre-line">
+                  {part}
+                </p>
+              );
+            });
+          })()}
+        </div>
 
         {/* 预览模态框 */}
         {isPreviewOpen && (
