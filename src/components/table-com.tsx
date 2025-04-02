@@ -10,11 +10,9 @@ import { useState, useEffect, useRef } from "react";
 // 模拟通知数据
 const allNotifications = Array.from({ length: 50 }, (_, i) => ({
   avatarUrl: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
-  userName: `送你离开 ${i + 1}`,
-  title: `标题,标题,标题,标题,标题,标题,标题,标题,标题,标题 ${i + 1}`,
-  description: `这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息,这是通知的描述信息 ${
-    i + 1
-  }。`,
+  userName: `今天我们分享一个GoLang的小知识 ${i + 1}`,
+  title: `如何在使用Go的协程 ${i + 1}`,
+  description: ``,
   imageUrl: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
 }));
 

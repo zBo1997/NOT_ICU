@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+
 import {
   Sheet,
   SheetClose,
@@ -12,26 +13,30 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { AvatarCom } from "@/components/avatar-com";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism"; // 选择一款主题
+import { MarkdownContentComp } from "@/components/markdown-com";
+// import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+// import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+// import { detectLanguage } from "@/utils/formmat_code";
+
 
 // 模拟讨论话题数据
 const topic = {
   title: "Go中的协程到底是怎么实现的？",
   description: "Go语言中的协程是如何实现的？为什么它这么快？",
   content: `首先我们来看一个Go协程示例：
-\`\`\`go
+\`\`\`java
 package main
 
 import "fmt"
 
 func main() {
-  go func() {
+    go func() {
     fmt.Println("这是一个协程")
   }()
 }
+  
 \`\`\`
-这是解释说明部分`,
+ ### 这是解释说明部分。`,
   images: [
     "https://picx.zhimg.com/v2-a096c2cd85dfcecba81581f6bfad8411_r.jpg?source=2c26e567",
   ], // 最多1张图片
@@ -111,39 +116,10 @@ export function SheetCom() {
           </div>
           <SheetDescription>{topic.description}</SheetDescription>
         </SheetHeader>
-        <div className="content space-y-4">
-          {(() => {
-            //判断是否是代码块
-            const parts = topic.content.split(/(```[\s\S]+?```)/g);
-            return parts.map((part, i) => {
-              if (part.startsWith("```") && part.endsWith("```")) {
-                const [language, ...codeLines] = part
-                  .replace(/```/g, "")
-                  .trim()
-                  .split("\n");
-                const code = codeLines.join("\n");
-                return (
-                  <SyntaxHighlighter
-                    language={language || "text"}
-                    style={atomDark}
-                    key={`code-${i}`}
-                    customStyle={{
-                      borderRadius: "0.5rem",
-                      margin: "1rem 0",
-                      fontSize: "14px",
-                    }}
-                  >
-                    {code}
-                  </SyntaxHighlighter>
-                );
-              }
-              return (
-                <p key={`text-${i}`} className="whitespace-pre-line">
-                  {part}
-                </p>
-              );
-            });
-          })()}
+
+        <div className="mt-4">
+          {/* 使用 ReactMarkdown 来渲染 Markdown 内容 */}
+          <MarkdownContentComp markdownContent={topic.content}></MarkdownContentComp>
         </div>
 
         {/* 预览模态框 */}
