@@ -1,77 +1,74 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { IdleCardCom } from "./idle-card-com";
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import axios from "axios";
+import { Users } from "lucide-react";
 
-// 模拟通知数据
-const allNotifications = Array.from({ length: 50 }, (_, i) => ({
-  avatarUrl: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
-  userName: `今天我们分享一个GoLang的小知识 ${i + 1}`,
-  title: `如何在使用Go的协程 ${i + 1}`,
-  description: ``,
-  imageUrl: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
-}));
+interface Notification {
+  id: string;
+  avatarUrl: string;
+  userName: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+}
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 5;
 
 export function TableCom() {
-  const [notifications, setNotifications] = useState(
-    allNotifications.slice(0, PAGE_SIZE)
-  );
+  const [article, setArticle] = useState<Notification[]>([]);
   const [page, setPage] = useState(1);
-  const loaderRef = useRef<HTMLDivElement | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [total, setTotal] = useState(-1); // 假设总数据量为100
+  const hasMore = React.useRef<HTMLDivElement>(null);
 
-  // 监听滚动事件
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const target = entries[0];
-        if (target.isIntersecting) {
-          loadMoreData();
-        }
-      },
-      { threshold: 1.0 }
-    );
+  const fetchArticle = useCallback(async () => {
+    // 判断是否还有更多数据
+    if (loading || (page > total / PAGE_SIZE && total != -1)) return;
+    setLoading(true);
 
-    if (loaderRef.current) {
-      observer.observe(loaderRef.current);
+    try {
+      const response = await axios.get(`/api/pageArticle`, {
+        params: {
+          page,
+          pageSize: PAGE_SIZE,
+        },
+      });
+
+      setArticle((prev) => [...prev, ...response.data.items]);
+      setPage((prev) => prev + 1);
+      setTotal(response.data.total); // 更新总数据量
+    } catch (error) {
+      console.error("Error fetching article:", error);
+    } finally {
+      setLoading(false);
     }
+  }, [loading, page, total]);
 
+  useEffect(() => {
+    const ob = new IntersectionObserver((entries) => {
+      const ele = entries[0];
+      if (ele.isIntersecting && hasMore.current) {
+        fetchArticle();
+      }
+    }, {});
+    const currentHasMore = hasMore.current;
+    if (currentHasMore) ob.observe(currentHasMore);
     return () => {
-      if (loaderRef.current) {
-        observer.unobserve(loaderRef.current);
+      if (currentHasMore) {
+        ob.unobserve(currentHasMore);
       }
     };
-  }, [page]);
-
-  // 模拟加载更多数据
-  const loadMoreData = () => {
-    const nextPage = page + 1;
-    const newNotifications = allNotifications.slice(0, nextPage * PAGE_SIZE);
-
-    if (newNotifications.length > notifications.length) {
-      setNotifications(newNotifications);
-      setPage(nextPage);
-    }
-  };
-
+  });
   return (
     <div
       className="overflow-y-auto max-h-[650px]"
-      style={{
-        /* 隐藏滚动条 */
-        scrollbarWidth: "none" /* Firefox */,
-        msOverflowStyle: "none" /* Internet Explorer */,
-      }}
+      style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
     >
       <Table>
         <TableBody>
-          {notifications.map((notification, index) => (
-            <TableRow key={index}>
+          {article.map((notification, index) => (
+            <TableRow key={`${notification.id}-${index}`}>
               <TableCell className="font-medium">
                 <IdleCardCom notification={notification} />
               </TableCell>
@@ -79,11 +76,10 @@ export function TableCom() {
           ))}
         </TableBody>
       </Table>
-      <div ref={loaderRef} className="py-4 text-center">
-        {notifications.length < allNotifications.length
-          ? "加载更多..."
-          : "---我是有底线的---"}
+      <div ref={hasMore}>
+        {loading && <div className="py-4 text-center">加载中...</div>}
       </div>
+      {!hasMore && <div className="py-4 text-center">---我是有底线的---</div>}
     </div>
   );
 }

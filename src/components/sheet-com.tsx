@@ -21,22 +21,9 @@ import { MarkdownContentComp } from "@/components/markdown-com";
 
 // 模拟讨论话题数据
 const topic = {
-  title: "Go中的协程到底是怎么实现的？",
-  description: "Go语言中的协程是如何实现的？为什么它这么快？",
-  content: `首先我们来看一个Go协程示例：
-\`\`\`java
-package main
-
-import "fmt"
-
-func main() {
-    go func() {
-    fmt.Println("这是一个协程")
-  }()
-}
-  
-\`\`\`
- ### 这是解释说明部分。`,
+  title: "最近公司裁员了，强制让我们签了变更主体的劳动合同",
+  tag: "#裁员 #劳动合同 #变更主体 #劳动法",
+  content: `最近公司裁员了，强制让我们签了变更主体的劳动合同。我们在公司工作了两年，突然就被告知要签一个新的合同，而且合同的条款和之前的完全不同。我们觉得这样不合理，想知道大家有没有类似的经历？你们是怎么处理的？\n\n## 讨论要点\n- 裁员的合法性\n- 劳动合同变更的法律规定\n- 如何保护自己的权益`,
   images: [
     "https://picx.zhimg.com/v2-a096c2cd85dfcecba81581f6bfad8411_r.jpg?source=2c26e567",
   ], // 最多1张图片
@@ -97,7 +84,7 @@ export function SheetCom() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline">参与讨论</Button>
+        <Button variant="outline">让我看看</Button>
       </SheetTrigger>
       <SheetContent className="w-full max-w-xl overflow-y-auto">
         <SheetHeader>
@@ -114,12 +101,14 @@ export function SheetCom() {
               />
             ))}
           </div>
-          <SheetDescription>{topic.description}</SheetDescription>
+          <SheetDescription>{topic.tag}</SheetDescription>
         </SheetHeader>
 
         <div className="mt-4">
           {/* 使用 ReactMarkdown 来渲染 Markdown 内容 */}
-          <MarkdownContentComp markdownContent={topic.content}></MarkdownContentComp>
+          <MarkdownContentComp
+            markdownContent={topic.content}
+          ></MarkdownContentComp>
         </div>
 
         {/* 预览模态框 */}
