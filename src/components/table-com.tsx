@@ -2,7 +2,6 @@ import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { IdleCardCom } from "./idle-card-com";
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import { Users } from "lucide-react";
 
 interface Notification {
   id: string;
@@ -19,7 +18,7 @@ export function TableCom() {
   const [article, setArticle] = useState<Notification[]>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [total, setTotal] = useState(-1); // 假设总数据量为100
+  const [total, setTotal] = useState(-1);
   const hasMore = React.useRef<HTMLDivElement>(null);
 
   const fetchArticle = useCallback(async () => {
@@ -37,7 +36,7 @@ export function TableCom() {
 
       setArticle((prev) => [...prev, ...response.data.items]);
       setPage((prev) => prev + 1);
-      setTotal(response.data.total); // 更新总数据量
+      setTotal(response.data.total);
     } catch (error) {
       console.error("Error fetching article:", error);
     } finally {
@@ -79,7 +78,7 @@ export function TableCom() {
       <div ref={hasMore}>
         {loading && <div className="py-4 text-center">加载中...</div>}
       </div>
-      {!hasMore && <div className="py-4 text-center">---我是有底线的---</div>}
+      {hasMore && <div className="py-4 text-center">---我是有底线的---</div>}
     </div>
   );
 }
