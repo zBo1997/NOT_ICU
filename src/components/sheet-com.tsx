@@ -57,6 +57,8 @@ export function SheetCom({ articleId }: CardProps) {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false); // 控制预览弹窗
   const [currentImage, setCurrentImage] = useState<string>("");
 
+  console.log(articleId);
+
   // 打开预览模态框
   const handleImageClick = (image: string) => {
     setCurrentImage(image);
