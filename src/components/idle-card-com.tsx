@@ -1,54 +1,77 @@
-import { cn } from "@/lib/utils"
-import { AvatarCom } from '@/components/avatar-com';
+import { cn } from "@/lib/utils";
+import { AvatarCom } from "@/components/avatar-com";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import { SheetCom } from "./sheet-com";
+import { format } from "date-fns";
 
-
-type Notification = {
-    avatarUrl: string,
-    userName: string;
-    title: string;
-    description: string;
-    imageUrl :string 
+type Article = {
+  ID: string;
+  CreatedAt: string;
+  title: string;
+  content: string;
+  avatarUrl: string;
+  name: string;
+  userId: string;
+  TagNames: string[];
 };
 
 type CardProps = React.ComponentProps<typeof Card> & {
-    notification?: Notification;
+  article?: Article;
 };
 
-export function IdleCardCom({ className, 
-    notification,
-    ...props}: CardProps) {
-  const avatarUrl = notification?.avatarUrl || "default-avatar.png"; // default image
-  const userName = notification?.userName || "Unknown User"; // default name
+export function IdleCardCom({ className, article, ...props }: CardProps) {
+  // 默认值处理
+  const avatarUrl = `${article?.avatarUrl || "default"}`;
+  const userName = `${article?.name || "匿名"}`;
+  const formattedDate = article?.CreatedAt
+    ? format(new Date(article.CreatedAt), "yyyy-MM-dd HH:mm")
+    : "未知时间";
+
   return (
-    <Card className={cn("", className)} {...props}>
+    <Card className={cn("w-full", className)} {...props}>
       <CardHeader>
-        <CardTitle>
-        <AvatarCom avatarInfo={{ userName, avatarUrl }} size="lg" className="mt-1"/>
-        <div className="mt-3">
-            {notification?.userName}
-        </div>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="flex">
-        {/* Left side: Content */}
-        <div className="flex-1">
-          <div className="space-y-2">
-            <p className="text-sm font-medium">{notification?.title}</p>
-            <p className="text-sm text-muted-foreground">{notification?.description}</p>
+        <div className="flex items-center space-x-3">
+          <AvatarCom avatarInfo={{ userName, avatarUrl }} size="lg" />
+          <div>
+            <CardTitle>{userName}</CardTitle>
+            <div className="text-sm text-muted-foreground">{` 发布于: ${formattedDate}`}</div>
           </div>
         </div>
+      </CardHeader>
+
+      <CardContent className="space-y-4">
+        <div>
+          <h3 className="text-lg font-semibold">
+            {article?.title || "无标题"}
+          </h3>
+          <p className="text-sm mt-2 line-clamp-3">
+            {article?.content || "无内容"}
+          </p>
+        </div>
+
+        {article?.TagNames && article.TagNames.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {article.TagNames.map((tag) => (
+              <span
+                key={tag}
+                className="px-2 py-1 bg-secondary text-secondary-foreground rounded-full text-xs"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
       </CardContent>
-      <CardFooter>
-      <SheetCom/>
+
+      <CardFooter className="flex justify-end">
+        <SheetCom articleId={article?.ID} />
       </CardFooter>
     </Card>
-  )
+  );
 }

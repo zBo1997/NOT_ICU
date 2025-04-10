@@ -45,7 +45,12 @@ const existingComments = [
   },
 ];
 
-export function SheetCom() {
+type CardProps = React.ComponentProps<typeof Sheet> & {
+  //文章编号
+  articleId?: string;
+};
+
+export function SheetCom({ articleId }: CardProps) {
   const [commentText, setCommentText] = useState("");
   const [comments, setComments] = useState(existingComments);
 

@@ -3,19 +3,21 @@ import { IdleCardCom } from "./idle-card-com";
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
-interface Notification {
-  id: string;
-  avatarUrl: string;
-  userName: string;
+interface Article {
+  ID: string;
+  CreatedAt: string;
   title: string;
-  description: string;
-  imageUrl: string;
+  content: string;
+  userId: string;
+  avatarUrl: string;
+  name: string;
+  TagNames: string[];
 }
 
 const PAGE_SIZE = 5;
 
 export function TableCom() {
-  const [article, setArticle] = useState<Notification[]>([]);
+  const [article, setArticle] = useState<Article[]>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [total, setTotal] = useState(-1);
@@ -33,7 +35,6 @@ export function TableCom() {
           pageSize: PAGE_SIZE,
         },
       });
-
       setArticle((prev) => [...prev, ...response.data.items]);
       setPage((prev) => prev + 1);
       setTotal(response.data.total);
@@ -59,6 +60,7 @@ export function TableCom() {
       }
     };
   });
+
   return (
     <div
       className="overflow-y-auto max-h-[650px]"
@@ -67,9 +69,9 @@ export function TableCom() {
       <Table>
         <TableBody>
           {article.map((notification, index) => (
-            <TableRow key={`${notification.id}-${index}`}>
+            <TableRow key={`${notification.ID}-${index}`}>
               <TableCell className="font-medium">
-                <IdleCardCom notification={notification} />
+                <IdleCardCom article={notification} />
               </TableCell>
             </TableRow>
           ))}
@@ -77,8 +79,8 @@ export function TableCom() {
       </Table>
       <div ref={hasMore}>
         {loading && <div className="py-4 text-center">加载中...</div>}
+        {hasMore && <div className="py-4 text-center">---我是有底线的---</div>}
       </div>
-      {hasMore && <div className="py-4 text-center">---我是有底线的---</div>}
     </div>
   );
 }
