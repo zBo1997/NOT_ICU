@@ -42,7 +42,10 @@ export function AvatarCom({
 
     return (
       <Avatar className={`${sizeClasses[size]} ${className}`} {...props}>
-        <AvatarImage src={avatarUrl} alt={userName} />
+        <AvatarImage
+          src={`https://theta.icu/files/${avatarUrl}`}
+          alt={userName}
+        />
         <AvatarFallback>{getInitials(userName)}</AvatarFallback>
       </Avatar>
     );
