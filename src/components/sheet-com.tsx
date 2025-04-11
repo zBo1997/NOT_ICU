@@ -104,7 +104,7 @@ export function SheetCom({ articleId }: CardProps) {
         ) : article ? (
           <>
             <SheetHeader>
-              <SheetTitle key="1">你好</SheetTitle>
+              <SheetTitle>你好</SheetTitle>
               <div className="flex items-center space-x-4 mt-4">
                 <AvatarCom
                   avatarInfo={{
