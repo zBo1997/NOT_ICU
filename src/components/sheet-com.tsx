@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -41,30 +41,6 @@ export function SheetCom({ articleId }: CardProps) {
   //const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   // const [currentImage, setCurrentImage] = useState<string>("");
 
-  // 👉 用 useEffect 在抽屉打开时请求数据
-  useEffect(() => {
-    const fetchArticleDetails = async () => {
-      try {
-        if (articleId) {
-          setLoading(true);
-          const response = await axios.get(`/api/article/${articleId}`);
-          console.log("文章详情:", response.data);
-          setArticle(response.data.article);
-        } else {
-          console.warn("未传入 articleId，无法获取文章数据");
-        }
-      } catch (error) {
-        console.error("Error fetching article:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (isSheetOpen) {
-      fetchArticleDetails();
-    }
-  }, [articleId, isSheetOpen]);
-
   // // 打开预览模态框
   // const handleImageClick = (image: string) => {
   //   setCurrentImage(image);
@@ -77,8 +53,23 @@ export function SheetCom({ articleId }: CardProps) {
   // };
 
   // 点击按钮时触发请求并打开抽屉
-  const handleOpenSheet = () => {
+  const handleOpenSheet = async () => {
     setIsSheetOpen(true);
+
+    if (articleId) {
+      try {
+        setLoading(true);
+        const response = await axios.get(`/api/article/${articleId}`);
+        console.log("文章详情:", response.data);
+        setArticle(response.data.article);
+      } catch (error) {
+        console.error("Error fetching article:", error);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      console.warn("未传入 articleId，无法获取文章数据");
+    }
   };
 
   // 处理评论提交
