@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -35,30 +35,35 @@ export function SheetCom({ articleId }: CardProps) {
   const [comments, setComments] = useState<
     { userName: string; comment: string; time: string; avatarUrl: string }[]
   >([]);
-  const [article, setArticle] = useState<Article>(); // 存储文章详情
+  const [article, setArticle] = useState<Article | null>(null); // 存储文章详情
   const [isSheetOpen, setIsSheetOpen] = useState(false); // 控制抽屉是否打开
   const [loading, setLoading] = useState(false); // 控制加载状态
   //const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   // const [currentImage, setCurrentImage] = useState<string>("");
 
-  // 获取文章详情
-  const fetchArticleDetails = () => {
-    if (articleId) {
-      setLoading(true); // 开始加载
-      axios
-        .get(`/api/article/${articleId}`)
-        .then((response) => {
+  // 👉 用 useEffect 在抽屉打开时请求数据
+  useEffect(() => {
+    const fetchArticleDetails = async () => {
+      try {
+        if (articleId) {
+          setLoading(true);
+          const response = await axios.get(`/api/article/${articleId}`);
           console.log("文章详情:", response.data);
-          setArticle(response.data);
-        })
-        .catch((error) => {
-          console.error("Error fetching article details:", error);
-        })
-        .finally(() => {
-          setLoading(false); // 加载完成
-        });
+          setArticle(response.data.article);
+        } else {
+          console.warn("未传入 articleId，无法获取文章数据");
+        }
+      } catch (error) {
+        console.error("Error fetching article:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (isSheetOpen) {
+      fetchArticleDetails();
     }
-  };
+  }, [articleId, isSheetOpen]);
 
   // // 打开预览模态框
   // const handleImageClick = (image: string) => {
@@ -73,7 +78,6 @@ export function SheetCom({ articleId }: CardProps) {
 
   // 点击按钮时触发请求并打开抽屉
   const handleOpenSheet = () => {
-    fetchArticleDetails();
     setIsSheetOpen(true);
   };
 
@@ -101,20 +105,20 @@ export function SheetCom({ articleId }: CardProps) {
       <SheetContent className="w-full max-w-xl overflow-y-auto">
         {loading ? (
           <div className="py-4 text-center">加载中...</div>
-        ) : article ? (
+        ) : (
           <>
             <SheetHeader>
-              <SheetTitle>你好</SheetTitle>
+              <SheetTitle>{article?.title || ""}</SheetTitle>
               <div className="flex items-center space-x-4 mt-4">
                 <AvatarCom
                   avatarInfo={{
-                    userName: article.name,
-                    avatarUrl: article.avatarUrl,
+                    userName: article?.name || "未知作者",
+                    avatarUrl: article?.avatarUrl,
                   }}
                   size="sm"
                 />
                 <p className="text-sm text-muted-foreground">
-                  作者：{article.name}
+                  作者：{article?.name}
                 </p>
               </div>
               <SheetDescription className="mt-2">
@@ -131,7 +135,7 @@ export function SheetCom({ articleId }: CardProps) {
 
             <div className="mt-4">
               <MarkdownContentComp
-                markdownContent={article.content}
+                markdownContent={article?.content || ""}
               ></MarkdownContentComp>
             </div>
 
@@ -221,8 +225,6 @@ export function SheetCom({ articleId }: CardProps) {
               </div> */}
             </div>
           </>
-        ) : (
-          <div className="py-4 text-center">加载中...</div>
         )}
 
         <SheetFooter>
