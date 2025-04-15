@@ -14,6 +14,8 @@ import {
 import { AvatarCom } from "@/components/avatar-com";
 import { MarkdownContentComp } from "@/components/markdown-com";
 import axios from "axios";
+import { formatDistanceToNow } from "date-fns"; // 用于格式化时间
+import { zhCN } from "date-fns/locale"; // 中文本地化
 
 type CardProps = React.ComponentProps<typeof Sheet> & {
   articleId?: string;
@@ -28,42 +30,61 @@ interface Article {
   avatarUrl: string;
   name: string;
   TagNames: string[];
+  images: string[];
+}
+
+interface Comments {
+  ID: string;
+  name: string;
+  comment: string;
+  CreatedAt: string;
+  avatarUrl: string;
+  parentId?: string | null; // 父评论ID
+  parentName?: string | null; // 父评论用户名
 }
 
 export function SheetCom({ articleId }: CardProps) {
   const [commentText, setCommentText] = useState("");
-  const [comments, setComments] = useState<
-    { userName: string; comment: string; time: string; avatarUrl: string }[]
-  >([]);
+  const [comments, setComments] = useState<Comments[]>([]);
   const [article, setArticle] = useState<Article | null>(null); // 存储文章详情
   const [isSheetOpen, setIsSheetOpen] = useState(false); // 控制抽屉是否打开
   const [loading, setLoading] = useState(false); // 控制加载状态
-  //const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  // const [currentImage, setCurrentImage] = useState<string>("");
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [currentImage, setCurrentImage] = useState<string>("");
+  const [replyTo, setReplyTo] = useState<Comments | null>(null); // 当前正在回复的评论
 
-  // // 打开预览模态框
-  // const handleImageClick = (image: string) => {
-  //   setCurrentImage(image);
-  //   setIsPreviewOpen(true);
-  // };
+  // 打开预览模态框
+  const handleImageClick = (image: string) => {
+    setCurrentImage(image);
+    setIsPreviewOpen(true);
+  };
 
-  // 关闭预览模态框
-  // const handleClosePreview = () => {
-  //   setIsPreviewOpen(false);
-  // };
+  const handleClosePreview = () => {
+    setIsPreviewOpen(false);
+  };
 
-  // 点击按钮时触发请求并打开抽屉
   const handleOpenSheet = async () => {
     setIsSheetOpen(true);
 
     if (articleId) {
       try {
         setLoading(true);
+
+        // 获取文章详情
         const response = await axios.get(`/api/article/${articleId}`);
-        console.log("文章详情:", response.data);
+        if (!response.data.article.images) {
+          response.data.article.images = [
+            "https://pic.rmb.bdstatic.com/bjh/news/b8b14a82230fd71763b347baca0efb9d.jpeg@h_1280",
+          ];
+        }
         setArticle(response.data.article);
+
+        // 获取评论
+        const commentsResponse = await axios.get(`/api/comments/${articleId}`);
+        console.log(commentsResponse.data.comments);
+        setComments(commentsResponse.data.comments || []);
       } catch (error) {
-        console.error("Error fetching article:", error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
@@ -73,16 +94,38 @@ export function SheetCom({ articleId }: CardProps) {
   };
 
   // 处理评论提交
-  const handleCommentSubmit = () => {
+  const handleCommentSubmit = async () => {
     if (commentText.trim()) {
       const newComment = {
-        userName: "当前用户",
+        ID: "123",
+        CreatedAt: new Date().toISOString(), // 使用 ISO 时间格式
+        name: "当前用户",
         comment: commentText,
-        time: "刚刚",
+        time: new Date().toISOString(), // 使用 ISO 时间格式
         avatarUrl: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
       };
-      setComments([newComment, ...comments]);
-      setCommentText("");
+
+      try {
+        // 假设有一个后端 API 用于保存评论
+        await axios.post(`/api/comments/${articleId}`, newComment);
+        setComments([newComment, ...comments]);
+        setCommentText("");
+      } catch (error) {
+        console.error("Error submitting comment:", error);
+      }
+    }
+  };
+
+  // 删除评论
+  const handleDeleteComment = async (index: number) => {
+    const commentToDelete = comments[index];
+    try {
+      await axios.delete(
+        `/api/comments/${articleId}/comments/${commentToDelete.ID}`
+      );
+      setComments(comments.filter((_, i) => i !== index));
+    } catch (error) {
+      console.error("Error deleting comment:", error);
     }
   };
 
@@ -113,28 +156,23 @@ export function SheetCom({ articleId }: CardProps) {
                 </p>
               </div>
               <SheetDescription className="mt-2">
-                {/* {article.TagNames.map((tag: string, index: number) => (
+                {article?.TagNames.map((tag: string, index: number) => (
                   <span
                     key={index}
                     className="inline-block bg-gray-200 text-gray-800 text-xs px-2 py-1 rounded-full mr-2"
                   >
                     #{tag}
                   </span>
-                ))} */}
+                ))}
               </SheetDescription>
             </SheetHeader>
 
-            <div className="mt-4">
-              <MarkdownContentComp
-                markdownContent={article?.content || ""}
-              ></MarkdownContentComp>
-            </div>
-
-            {/* {article.images && article.images.length > 0 && (
+            {article?.images && article.images.length > 0 && (
               <div className="mt-4 flex justify-center">
                 {article.images.map((image: string, index: number) => (
                   <img
                     key={index}
+                    //如果没有图片展示默认图片
                     src={image}
                     alt={`文章图片 ${index + 1}`}
                     className="object-cover rounded-md cursor-pointer"
@@ -142,10 +180,16 @@ export function SheetCom({ articleId }: CardProps) {
                   />
                 ))}
               </div>
-            )} */}
+            )}
+
+            <div className="mt-4">
+              <MarkdownContentComp
+                markdownContent={article?.content || ""}
+              ></MarkdownContentComp>
+            </div>
 
             {/* 预览模态框 */}
-            {/* {isPreviewOpen && (
+            {isPreviewOpen && (
               <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
                 <div className="relative max-w-3xl max-h-[90vh] w-full h-full flex justify-center items-center">
                   <img
@@ -161,7 +205,7 @@ export function SheetCom({ articleId }: CardProps) {
                   </button>
                 </div>
               </div>
-            )} */}
+            )}
 
             <div className="space-y-6 py-4">
               {/* 评论输入框 */}
@@ -177,7 +221,9 @@ export function SheetCom({ articleId }: CardProps) {
                 <Input
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
-                  placeholder="输入您的评论..."
+                  placeholder={
+                    replyTo ? `回复 @${replyTo.name}:` : "输入您的评论..."
+                  }
                   className="w-full"
                 />
               </div>
@@ -187,33 +233,59 @@ export function SheetCom({ articleId }: CardProps) {
                   onClick={handleCommentSubmit}
                   disabled={!commentText.trim()}
                 >
-                  提交评论
+                  {replyTo ? `回复 @${replyTo.name}:` : "提交评论"}
                 </Button>
               </div>
 
               {/* 已有评论展示 */}
-              {/* <div className="space-y-4 mt-6">
+              <div className="space-y-4 mt-6">
                 {comments.map((comment, index) => (
                   <div key={index} className="flex space-x-4">
                     <AvatarCom
                       avatarInfo={{
-                        userName: comment.userName,
+                        userName: comment.name,
                         avatarUrl: comment.avatarUrl,
                       }}
                       size="sm"
                     />
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <p className="font-semibold">{comment.userName}</p>
+                        <p className="font-semibold">
+                          {comment.name}
+                          {comment.parentName && (
+                            <span className="text-sm text-gray-500 ml-2">
+                              回复 @{comment.parentName}
+                            </span>
+                          )}
+                        </p>
                         <p className="text-sm text-muted-foreground">
-                          {comment.time}
+                          {formatDistanceToNow(new Date(comment.CreatedAt), {
+                            locale: zhCN,
+                          })}{" "}
+                          前
                         </p>
                       </div>
                       <p className="mt-1">{comment.comment}</p>
+                      <div className="flex space-x-2 mt-2">
+                        <button
+                          onClick={() => {
+                            setReplyTo(comment); // 设置当前回复的评论
+                          }}
+                          className="text-sm text-blue-500"
+                        >
+                          回复
+                        </button>
+                        <button
+                          onClick={() => handleDeleteComment(index)}
+                          className="text-sm text-red-500"
+                        >
+                          删除
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
-              </div> */}
+              </div>
             </div>
           </>
         )}
