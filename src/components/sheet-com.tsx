@@ -107,7 +107,7 @@ export function SheetCom({ articleId }: CardProps) {
 
       try {
         // 假设有一个后端 API 用于保存评论
-        await axios.post(`/api/comments/${articleId}`, newComment);
+        await axios.post(`/api/comments/add/${articleId}`, newComment);
         setComments([newComment, ...comments]);
         setCommentText("");
       } catch (error) {
@@ -228,13 +228,17 @@ export function SheetCom({ articleId }: CardProps) {
                 />
               </div>
 
-              <div className="flex justify-end">
+              <div className="flex justify-end space-x-2">
                 <Button
                   onClick={handleCommentSubmit}
                   disabled={!commentText.trim()}
                 >
                   {replyTo ? `回复 @${replyTo.name}:` : "提交评论"}
                 </Button>
+                {/* 当为评论文章时候不展示此按钮 */}
+                {replyTo && (
+                  <Button onClick={() => setReplyTo(null)}>取消回复</Button>
+                )}
               </div>
 
               {/* 已有评论展示 */}
