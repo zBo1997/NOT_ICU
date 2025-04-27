@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { post } from "@/utils/request"; // 引入刚刚写的请求工具类
 import { useAlert } from "@/context/alert-context"; // 导入 useAlert
+import RotateCaptcha, { TicketInfoType } from "react-rotate-captcha";
 export function LoginForm({
   className,
   register,
@@ -14,10 +15,28 @@ export function LoginForm({
   // 使用 ref 来获取输入框值
   const usernameRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
+  const [captchaOpen, setCaptchaOpen] = useState(false); // 控制验证码显示
+  const [isCaptchaVerified, setIsCaptchaVerified] = useState(false); // 验证码是否通过
+  const [ticket, setTicket] = useState<TicketInfoType | undefined>(); // 验证码的 ticket
   const { showAlert } = useAlert(); // 获取 showAlert 方法
+
+  //从 localstorage 中获取验证码的主题配置
+  const [themeStr, setThemeStr] = useState("default"); // 定义状态
+
+  useEffect(() => {
+    const storedTheme = localStorage.getItem("vite-ui-theme") || "default";
+    setThemeStr(storedTheme); // 初始化主题
+  }, []);
+
   // 登录 TODO
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault(); // 阻止表单默认提交
+
+    if (!isCaptchaVerified) {
+      setCaptchaOpen(true); // 打开验证码
+      return;
+    }
+
     // 获取表单输入值
     const username = usernameRef.current?.value;
     const password = passwordRef.current?.value;
@@ -71,7 +90,8 @@ export function LoginForm({
                   type="text"
                   placeholder="请输入你的账号"
                   required
-                  ref={usernameRef} // 使用 ref 来获取值
+                  ref={usernameRef} // 使用 ref 来获取值、
+                  autoComplete="username" // 添加自动完成属性
                 />
               </div>
               <div className="grid gap-2">
@@ -90,6 +110,7 @@ export function LoginForm({
                   placeholder="请输入你的密码"
                   required
                   ref={passwordRef}
+                  autoComplete="current-password" // 添加自动完成属性
                 />
               </div>
               <Button type="submit" className="w-full" onClick={handleLogin}>
@@ -144,6 +165,16 @@ export function LoginForm({
           </div>
         </CardContent>
       </Card>
+      <RotateCaptcha
+        //从localstorage中获取验证码的主题配置
+        theme={
+          themeStr === "dark" || themeStr === "light" ? themeStr : undefined
+        }
+        open={captchaOpen}
+        onClose={() => setCaptchaOpen(false)}
+        result={(info) => setTicket(info)}
+        verify={verify}
+      />
       <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary">
         如果点击了继续,则代表你同意了我们的用户协议 <a href="#">服务条款</a> 和{" "}
         <a href="#">隐私政策</a>.

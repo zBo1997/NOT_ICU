@@ -106,7 +106,7 @@ export function SheetCom({ articleId }: CardProps) {
       };
 
       try {
-        // 假设有一个后端 API 用于保存评论
+        // 保存评论
         await axios.post(`/api/comments/add/${articleId}`, newComment);
         setComments([newComment, ...comments]);
         setCommentText("");
