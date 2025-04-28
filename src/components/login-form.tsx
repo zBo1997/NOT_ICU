@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRef } from "react";
-import { post } from "@/utils/request"; // 引入刚刚写的请求工具类
+import { useRef, useEffect, useState } from "react";
+import { post, get } from "@/utils/request"; // 引入刚刚写的请求工具类
 import { useAlert } from "@/context/alert-context"; // 导入 useAlert
 export function LoginForm({
   className,
@@ -14,13 +14,39 @@ export function LoginForm({
   // 使用 ref 来获取输入框值
   const usernameRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
+  const captchaRef = useRef<HTMLInputElement | null>(null); // 新增验证码输入框的 ref
+
   const { showAlert } = useAlert(); // 获取 showAlert 方法
-  // 登录 TODO
+  const [captchaImage, setCaptchaImage] = useState<string>(""); // 用于存储验证码图片的状态
+
+  // 获取验证码图片
+  const fetchCaptcha = async () => {
+    try {
+      const response = await get<ArrayBuffer>("/captcha", {
+        responseType: "arraybuffer", // 设置响应类型为 arraybuffer
+      });
+      // 将二进制数据转换为图片 URL
+      const blob = new Blob([response], { type: "image/png" });
+      const url = URL.createObjectURL(blob);
+      console.error("url:" + url);
+      setCaptchaImage(url); // 设置验证码图片
+    } catch (error) {
+      console.error(error);
+      showAlert("获取验证码失败", "请稍后重试");
+    }
+  };
+
+  // 在组件加载时获取验证码
+  useEffect(() => {
+    fetchCaptcha();
+  }, []);
+
+  // 登录
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault(); // 阻止表单默认提交
-    // 获取表单输入值
+    e.preventDefault();
     const username = usernameRef.current?.value;
     const password = passwordRef.current?.value;
+    const captcha = captchaRef.current?.value; // 获取验证码输入值
 
     try {
       const response = await post<{
@@ -30,18 +56,19 @@ export function LoginForm({
       }>("login", {
         username,
         password,
+        captcha, // 将验证码发送到后端
       });
       if (response.data.error) {
-        showAlert(response.data.error, response.data.errorContent); // 登录失败弹出警告
+        showAlert(response.data.error, response.data.errorContent);
+        fetchCaptcha(); // 验证失败时刷新验证码
         return;
       } else {
-        //设置用户信息
-        localStorage.setItem("user", JSON.stringify(response.data)); // 保存用户信息
-        // 如果登录成功，可以保存 token 或用户信息到本地
-        window.location.reload(); // 重新加载页面
+        localStorage.setItem("user", JSON.stringify(response.data));
+        window.location.reload();
       }
     } catch (error) {
-      showAlert("登录失败", "服务器出小差了"); // 登录失败弹出警告
+      showAlert("登录失败", "服务器出小差了");
+      fetchCaptcha(); // 请求失败时刷新验证码
       console.log(error);
       return;
     }
@@ -91,6 +118,24 @@ export function LoginForm({
                   required
                   ref={passwordRef}
                 />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="captcha">验证码</Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="captcha"
+                    type="text"
+                    placeholder="请输入验证码"
+                    required
+                    ref={captchaRef}
+                  />
+                  <img
+                    src={captchaImage}
+                    alt="验证码"
+                    className="h-10 cursor-pointer"
+                    onClick={fetchCaptcha} // 点击刷新验证码
+                  />
+                </div>
               </div>
               <Button type="submit" className="w-full" onClick={handleLogin}>
                 登 录
