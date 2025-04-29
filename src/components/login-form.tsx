@@ -46,7 +46,7 @@ export function LoginForm({
     e.preventDefault();
     const username = usernameRef.current?.value?.trim();
     const password = passwordRef.current?.value?.trim();
-    const captcha = captchaRef.current?.value?.trim();
+    const captchaCode = captchaRef.current?.value?.trim();
 
     // 手动验证必填字段
     if (!username) {
@@ -57,7 +57,7 @@ export function LoginForm({
       showAlert("密码不能为空", "请输入密码");
       return;
     }
-    if (!captcha) {
+    if (!captchaCode) {
       showAlert("验证码不能为空", "请输入验证码");
       return;
     }
@@ -70,7 +70,7 @@ export function LoginForm({
       }>("login", {
         username,
         password,
-        captcha, // 将验证码发送到后端
+        captchaCode, // 将验证码发送到后端
         captchaId: captchaId, // 将验证码 ID 一起发送到后端
       });
       if (response.data.error) {
