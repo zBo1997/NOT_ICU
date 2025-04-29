@@ -18,18 +18,18 @@ export function LoginForm({
 
   const { showAlert } = useAlert(); // 获取 showAlert 方法
   const [captchaImage, setCaptchaImage] = useState<string>(""); // 用于存储验证码图片的状态
+  const [captchaId, setCaptchaId] = useState<string>(""); // 用于存储验证码 ID
 
   // 获取验证码图片
   const fetchCaptcha = async () => {
     try {
-      const response = await get<ArrayBuffer>("/captcha", {
-        responseType: "arraybuffer", // 设置响应类型为 arraybuffer
-      });
-      // 将二进制数据转换为图片 URL
-      const blob = new Blob([response], { type: "image/png" });
-      const url = URL.createObjectURL(blob);
-      console.error("url:" + url);
-      setCaptchaImage(url); // 设置验证码图片
+      // 这里直接拿到 JSON 对象
+      const response = await get<{
+        captcha_id: string;
+        captcha_image: string;
+      }>("/captcha");
+      setCaptchaImage(`data:image/png;base64,${response.data.captcha_image}`);
+      setCaptchaId(response.data.captcha_id);
     } catch (error) {
       console.error(error);
       showAlert("获取验证码失败", "请稍后重试");
@@ -44,9 +44,23 @@ export function LoginForm({
   // 登录
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const username = usernameRef.current?.value;
-    const password = passwordRef.current?.value;
-    const captcha = captchaRef.current?.value; // 获取验证码输入值
+    const username = usernameRef.current?.value?.trim();
+    const password = passwordRef.current?.value?.trim();
+    const captcha = captchaRef.current?.value?.trim();
+
+    // 手动验证必填字段
+    if (!username) {
+      showAlert("用户名不能为空", "请输入用户名");
+      return;
+    }
+    if (!password) {
+      showAlert("密码不能为空", "请输入密码");
+      return;
+    }
+    if (!captcha) {
+      showAlert("验证码不能为空", "请输入验证码");
+      return;
+    }
 
     try {
       const response = await post<{
@@ -57,6 +71,7 @@ export function LoginForm({
         username,
         password,
         captcha, // 将验证码发送到后端
+        captchaId: captchaId, // 将验证码 ID 一起发送到后端
       });
       if (response.data.error) {
         showAlert(response.data.error, response.data.errorContent);
@@ -97,6 +112,7 @@ export function LoginForm({
                   id="username"
                   type="text"
                   placeholder="请输入你的账号"
+                  autoComplete="username"
                   required
                   ref={usernameRef} // 使用 ref 来获取值
                 />
@@ -115,6 +131,7 @@ export function LoginForm({
                   id="password"
                   type="password"
                   placeholder="请输入你的密码"
+                  autoComplete="current-password"
                   required
                   ref={passwordRef}
                 />
