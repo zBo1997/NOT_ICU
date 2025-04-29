@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRef } from "react";
-import { post } from "@/utils/request"; // 引入刚刚写的请求工具类
+import { useRef, useEffect, useState } from "react";
+import { get, post } from "@/utils/request"; // 引入刚刚写的请求工具类
 import { useAlert } from "@/context/alert-context"; // 导入 useAlert
 
 export function RegisterForm({
@@ -16,15 +16,42 @@ export function RegisterForm({
   const usernameRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
   const nicknameRef = useRef<HTMLInputElement | null>(null);
+  const captchaRef = useRef<HTMLInputElement | null>(null); // 新增验证码输入框的 ref
+  const [captchaImage, setCaptchaImage] = useState<string>(""); // 用于存储验证码图片的状态
+  const [captchaId, setCaptchaId] = useState<string>(""); // 用于存储验证码 ID
+
+  // 获取验证码图片
+  const fetchCaptcha = async () => {
+    try {
+      // 这里直接拿到 JSON 对象
+      const response = await get<{
+        captcha_id: string;
+        captcha_image: string;
+      }>("/captcha");
+      setCaptchaImage(`data:image/png;base64,${response.data.captcha_image}`);
+      setCaptchaId(response.data.captcha_id);
+    } catch (error) {
+      console.error(error);
+      showAlert("获取验证码失败", "请稍后重试");
+    }
+  };
+
+  // 在组件加载时获取验证码
+  useEffect(() => {
+    fetchCaptcha();
+  }, []);
+
   const { showAlert } = useAlert(); // 获取 showAlert 方法
   // 注册
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault(); // 阻止表单默认提交
 
     // 获取表单输入值
-    const username = usernameRef.current?.value;
-    const password = passwordRef.current?.value;
-    const name = nicknameRef.current?.value;
+    const username = usernameRef.current?.value?.trim();
+    const password = passwordRef.current?.value?.trim();
+    const name = nicknameRef.current?.value?.trim();
+    const captchaCode = captchaRef.current?.value?.trim();
+
     try {
       const response = await post<{
         error: string;
@@ -33,9 +60,12 @@ export function RegisterForm({
         name,
         password,
         username,
+        captchaCode,
+        captchaId: captchaId, // 将验证码 ID 一起发送到后端
       });
       console.log(response);
       if (response.data.error) {
+        fetchCaptcha(); // 验证失败时刷新验证码
         showAlert(response.data.error, response.data.errorContent); // 登录失败弹出警告
         return;
       }
@@ -43,6 +73,7 @@ export function RegisterForm({
       window.location.reload(); // 重新加载页面
     } catch (error) {
       showAlert("注册失败", "服务器出小差了"); // 登录失败弹出警告
+      fetchCaptcha(); // 验证失败时刷新验证码
       console.log(error);
       return;
     }
@@ -109,6 +140,24 @@ export function RegisterForm({
                   required
                   ref={nicknameRef} // 使用 ref 来获取值
                 />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="captcha">验证码</Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="captcha"
+                    type="text"
+                    placeholder="请输入验证码"
+                    required
+                    ref={captchaRef}
+                  />
+                  <img
+                    src={captchaImage}
+                    alt="验证码"
+                    className="h-10 cursor-pointer"
+                    onClick={fetchCaptcha} // 点击刷新验证码
+                  />
+                </div>
               </div>
               <Button type="submit" className="w-full" onClick={handleRegister}>
                 注 册
