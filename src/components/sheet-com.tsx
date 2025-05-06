@@ -16,42 +16,48 @@ import { MarkdownContentComp } from "@/components/markdown-com";
 import axios from "axios";
 import { formatDistanceToNow } from "date-fns"; // 用于格式化时间
 import { zhCN } from "date-fns/locale"; // 中文本地化
+import { post, get } from "@/utils/request"; // 引入你的请求工具类
 
 type CardProps = React.ComponentProps<typeof Sheet> & {
   articleId?: string;
 };
 
 interface Article {
-  ID: string;
-  CreatedAt: string;
-  title: string;
-  content: string;
-  userId: string;
-  avatarUrl: string;
-  name: string;
-  TagNames: string[];
-  images: string[];
+  ID: string; // 文章ID
+  title: string; // 文章标题
+  content: string; // 文章内容
+  images: string[]; // 文章图片
+  name: string; // 作者名称
+  avatarUrl?: string; // 作者头像
+  TagNames: string[]; // 标签名称数组
 }
 
-interface Comments {
-  ID: string;
-  name: string;
-  comment: string;
-  CreatedAt: string;
-  avatarUrl: string;
-  parentId?: string | null; // 父评论ID
-  parentName?: string | null; // 父评论用户名
+// 展示评论的类型
+interface DisplayComment {
+  ID: string; // 评论ID
+  name: string; // 用户名
+  comment: string; // 评论内容
+  CreatedAt: string; // 创建时间
+  avatarUrl: string; // 用户头像
+  parentId?: string | null; // 父评论ID（可选）
+  parentName?: string | null; // 父评论用户名（可选）
+}
+
+// 提交评论的类型
+interface SubmitComment {
+  comment: string; // 评论内容
+  parentId?: string | null; // 父评论ID（可选）
 }
 
 export function SheetCom({ articleId }: CardProps) {
   const [commentText, setCommentText] = useState("");
-  const [comments, setComments] = useState<Comments[]>([]);
+  const [comments, setComments] = useState<DisplayComment[]>([]);
   const [article, setArticle] = useState<Article | null>(null); // 存储文章详情
   const [isSheetOpen, setIsSheetOpen] = useState(false); // 控制抽屉是否打开
   const [loading, setLoading] = useState(false); // 控制加载状态
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [currentImage, setCurrentImage] = useState<string>("");
-  const [replyTo, setReplyTo] = useState<Comments | null>(null); // 当前正在回复的评论
+  const [replyTo, setReplyTo] = useState<DisplayComment | null>(null); // 当前正在回复的评论
 
   // 打开预览模态框
   const handleImageClick = (image: string) => {
@@ -71,45 +77,55 @@ export function SheetCom({ articleId }: CardProps) {
         setLoading(true);
 
         // 获取文章详情
-        const response = await axios.get(`/api/article/${articleId}`);
-        if (!response.data.article.images) {
-          response.data.article.images = [
+        const response = await get<Article>(`/article/${articleId}`);
+        if (!response.data.images) {
+          response.data.images = [
             "https://pic.rmb.bdstatic.com/bjh/news/b8b14a82230fd71763b347baca0efb9d.jpeg@h_1280",
           ];
         }
-        setArticle(response.data.article);
+        setArticle(response.data);
 
         // 获取评论
-        const commentsResponse = await axios.get(`/api/comments/${articleId}`);
-        console.log(commentsResponse.data.comments);
-        setComments(commentsResponse.data.comments || []);
+        const commentsResponse = await get<DisplayComment[]>(
+          `/comments/${articleId}`
+        );
+        setComments(commentsResponse.data);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     } else {
-      console.warn("未传入 articleId，无法获取文章数据");
+      console.warn("未传入 articleId,无法获取文章数据");
     }
   };
 
   // 处理评论提交
   const handleCommentSubmit = async () => {
     if (commentText.trim()) {
-      const newComment = {
-        ID: "123",
-        CreatedAt: new Date().toISOString(), // 使用 ISO 时间格式
-        name: "当前用户",
+      const newComment: SubmitComment = {
         comment: commentText,
-        time: new Date().toISOString(), // 使用 ISO 时间格式
-        avatarUrl: "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
+        parentId: replyTo?.ID || null, // 如果是回复评论，设置父评论 ID
       };
 
       try {
-        // 假设有一个后端 API 用于保存评论
-        await axios.post(`/api/comments/add/${articleId}`, newComment);
-        setComments([newComment, ...comments]);
+        // 提交评论到后端
+        const response = await post<DisplayComment>(
+          `/comments/add/${articleId}`,
+          {
+            comment: newComment.comment,
+            parentId: newComment.parentId,
+          }
+        );
+
+        // 将后端返回的评论对象添加到评论列表
+        setComments([response.data, ...comments]);
+
+        // 清空评论输入框
         setCommentText("");
+
+        // 清除回复状态
+        setReplyTo(null);
       } catch (error) {
         console.error("Error submitting comment:", error);
       }
@@ -244,7 +260,7 @@ export function SheetCom({ articleId }: CardProps) {
               {/* 已有评论展示 */}
               <div className="space-y-4 mt-6">
                 {comments.map((comment, index) => (
-                  <div key={index} className="flex space-x-4">
+                  <div key={comment.ID} className="flex space-x-4">
                     <AvatarCom
                       avatarInfo={{
                         userName: comment.name,

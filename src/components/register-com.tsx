@@ -63,7 +63,6 @@ export function RegisterForm({
         captchaCode,
         captchaId: captchaId, // 将验证码 ID 一起发送到后端
       });
-      console.log(response);
       if (response.data.error) {
         fetchCaptcha(); // 验证失败时刷新验证码
         showAlert(response.data.error, response.data.errorContent); // 登录失败弹出警告

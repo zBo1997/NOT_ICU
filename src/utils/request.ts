@@ -14,9 +14,10 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // 这里可以添加 token 或其他公共请求头
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("user");
+    console.log("token", token);
     if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
+      config.headers["Authorization"] = `${JSON.parse(localStorage.getItem("user") || "{}").token}`;
     }
     return config;
   },
