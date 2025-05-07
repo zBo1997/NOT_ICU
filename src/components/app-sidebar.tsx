@@ -45,7 +45,7 @@ export function AppSidebar() {
   const user = UserProvider();
 
   return (
-    <Sidebar>
+    <Sidebar variant="floating" className="w-64">
       <SidebarHeader>ICU</SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
