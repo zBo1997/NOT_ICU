@@ -7,7 +7,7 @@ import { LoginForm } from "@/components/login-form";
 import { RegisterForm } from "@/components/register-com";
 import { UserProvider } from "@/common/user-context";
 import { useState } from "react";
-import { AlertProvider } from "@/context/alert-context"; // 导入 AlertProvider
+import { ToasterProvider } from "@/components/toaster-com";
 
 function App() {
   const user = UserProvider();
@@ -48,9 +48,9 @@ function App() {
 export default function AppWrapper() {
   return (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-      <AlertProvider>
+      <ToasterProvider>
         <App />
-      </AlertProvider>
+      </ToasterProvider>
     </ThemeProvider>
   );
 }

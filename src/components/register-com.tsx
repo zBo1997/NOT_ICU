@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRef, useEffect, useState } from "react";
 import { get, post } from "@/utils/request"; // 引入刚刚写的请求工具类
-import { useAlert } from "@/context/alert-context"; // 导入 useAlert
+import { toast } from "sonner"; // 引入 sonner 库 提示
 
 export function RegisterForm({
   className,
@@ -32,7 +32,7 @@ export function RegisterForm({
       setCaptchaId(response.data.captcha_id);
     } catch (error) {
       console.error(error);
-      showAlert("获取验证码失败", "请稍后重试");
+      toast("获取验证码失败");
     }
   };
 
@@ -41,7 +41,6 @@ export function RegisterForm({
     fetchCaptcha();
   }, []);
 
-  const { showAlert } = useAlert(); // 获取 showAlert 方法
   // 注册
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault(); // 阻止表单默认提交
@@ -65,13 +64,13 @@ export function RegisterForm({
       });
       if (response.data.error) {
         fetchCaptcha(); // 验证失败时刷新验证码
-        showAlert(response.data.error, response.data.errorContent); // 登录失败弹出警告
+        toast(response.data.errorContent); // 登录失败弹出警告
         return;
       }
       // 如果登录成功，可以保存 token 或用户信息到本地
       window.location.reload(); // 重新加载页面
     } catch (error) {
-      showAlert("注册失败", "服务器出小差了"); // 登录失败弹出警告
+      toast("注册失败"); // 登录失败弹出警告
       fetchCaptcha(); // 验证失败时刷新验证码
       console.log(error);
       return;

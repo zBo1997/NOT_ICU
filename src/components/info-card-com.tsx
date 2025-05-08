@@ -2,7 +2,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { User } from "@/common/user-context";
 import { AvatarUploadCom } from "@/components/avatar-upload";
-import { useAlert } from "@/context/alert-context"; // 导入 useAlert
+import { toast } from "sonner"; // 引入 sonner 库 提示
 import { postFormData } from "@/utils/request"; // 引入刚刚写的请求工具类
 export function InfoCardCom({
   user,
@@ -11,7 +11,6 @@ export function InfoCardCom({
   user: User | null;
   children: React.ReactNode;
 }) {
-  const { showAlert } = useAlert(); // 获取 showAlert 方法
   return (
     <Card className="flex flex-col  bg-gradient-to-r shadow-lg rounded-lg overflow-hidden">
       <CardContent className="w-full p-6">
@@ -43,7 +42,7 @@ export function InfoCardCom({
                     },
                   });
                   if (response.data.error) {
-                    showAlert(response.data.error, response.data.errorContent); // 更新失败弹出警告
+                    toast(response.data.errorContent); // 更新失败弹出警告
                     return;
                   } else {
                     const imgKey = response.data.imgKey;
@@ -54,7 +53,7 @@ export function InfoCardCom({
                     window.location.reload(); // 重新加载页面
                   }
                 } catch (error) {
-                  showAlert("更新失败", "服务器出小差了"); // 更新失败弹出警告
+                  toast("服务器出小差了"); // 更新失败弹出警告
                   console.log(error);
                   return;
                 }

@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRef, useEffect, useState } from "react";
 import { post, get } from "@/utils/request"; // 引入刚刚写的请求工具类
-import { useAlert } from "@/context/alert-context"; // 导入 useAlert
+import { toast } from "sonner"; // 引入 sonner 库 提示
 export function LoginForm({
   className,
   register,
@@ -16,7 +16,6 @@ export function LoginForm({
   const passwordRef = useRef<HTMLInputElement | null>(null);
   const captchaRef = useRef<HTMLInputElement | null>(null); // 新增验证码输入框的 ref
 
-  const { showAlert } = useAlert(); // 获取 showAlert 方法
   const [captchaImage, setCaptchaImage] = useState<string>(""); // 用于存储验证码图片的状态
   const [captchaId, setCaptchaId] = useState<string>(""); // 用于存储验证码 ID
 
@@ -32,7 +31,7 @@ export function LoginForm({
       setCaptchaId(response.data.captcha_id);
     } catch (error) {
       console.error(error);
-      showAlert("获取验证码失败", "请稍后重试");
+      toast("获取验证码失败");
     }
   };
 
@@ -50,15 +49,15 @@ export function LoginForm({
 
     // 手动验证必填字段
     if (!username) {
-      showAlert("用户名不能为空", "请输入用户名");
+      toast("用户名不能为空");
       return;
     }
     if (!password) {
-      showAlert("密码不能为空", "请输入密码");
+      toast("密码不能为空");
       return;
     }
     if (!captchaCode) {
-      showAlert("验证码不能为空", "请输入验证码");
+      toast("验证码不能为空");
       return;
     }
 
@@ -74,7 +73,7 @@ export function LoginForm({
         captchaId: captchaId, // 将验证码 ID 一起发送到后端
       });
       if (response.data.error) {
-        showAlert(response.data.error, response.data.errorContent);
+        toast(response.data.errorContent);
         fetchCaptcha(); // 验证失败时刷新验证码
         return;
       } else {
@@ -82,7 +81,7 @@ export function LoginForm({
         window.location.reload();
       }
     } catch (error) {
-      showAlert("登录失败", "服务器出小差了");
+      toast("服务器出小差了");
       fetchCaptcha(); // 请求失败时刷新验证码
       console.log(error);
       return;
