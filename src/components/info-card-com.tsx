@@ -13,7 +13,7 @@ export function InfoCardCom({
 }) {
   const { showAlert } = useAlert(); // 获取 showAlert 方法
   return (
-    <Card className="flex flex-col items-center justify-center w-full max-w-md mx-auto bg-gradient-to-r shadow-lg rounded-lg overflow-hidden">
+    <Card className="flex flex-col  bg-gradient-to-r shadow-lg rounded-lg overflow-hidden">
       <CardContent className="w-full p-6">
         {/* 个人信息卡片 */}
         <div>
