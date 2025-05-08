@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { useRef, useEffect, useState } from "react";
 import { get, post } from "@/utils/request"; // 引入刚刚写的请求工具类
 import { toast } from "sonner"; // 引入 sonner 库 提示
+import { ModeToggle } from "@/components/mode-toggle";
 
 export function RegisterForm({
   className,
@@ -88,7 +89,7 @@ export function RegisterForm({
       <Card className="overflow-hidden">
         <CardContent className="grid p-0 md:grid-cols-2">
           <form className="p-6 md:p-8">
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-3">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">注 册</h1>
                 <p className="text-balance text-muted-foreground">
@@ -157,9 +158,20 @@ export function RegisterForm({
                   />
                 </div>
               </div>
-              <Button type="submit" className="w-full" onClick={handleRegister}>
+              <Button
+                type="submit"
+                className="w-full gap-2"
+                onClick={handleRegister}
+              >
                 注 册
               </Button>
+
+              {/* 暗黑模式切换 */}
+              <div className="text-center">
+                亮瞎狗眼了？开启暗黑模式试试！
+                <ModeToggle />
+              </div>
+              {/* 分隔线 */}
               <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
                 <span className="relative z-10 bg-background px-2 text-muted-foreground">
                   或者从这里继续
