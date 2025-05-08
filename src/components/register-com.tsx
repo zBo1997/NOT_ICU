@@ -52,6 +52,24 @@ export function RegisterForm({
     const name = nicknameRef.current?.value?.trim();
     const captchaCode = captchaRef.current?.value?.trim();
 
+    // 手动验证必填字段
+    if (!username) {
+      toast("账户不能为空");
+      return;
+    }
+    if (!password) {
+      toast("密码不能为空");
+      return;
+    }
+    if (!name) {
+      toast("验证码不能为空");
+      return;
+    }
+    if (!captchaCode) {
+      toast("验证码不能为空");
+      return;
+    }
+
     try {
       const response = await post<{
         error: string;
@@ -65,7 +83,7 @@ export function RegisterForm({
       });
       if (response.data.error) {
         fetchCaptcha(); // 验证失败时刷新验证码
-        toast(response.data.errorContent); // 登录失败弹出警告
+        toast(response.data.error); // 登录失败弹出警告
         return;
       }
       // 如果登录成功，可以保存 token 或用户信息到本地
