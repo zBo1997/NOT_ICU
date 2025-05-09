@@ -15,13 +15,13 @@ export function CardCom({ className, ...props }: CardProps) {
   return (
     <Card className={cn("w-[380px]", className)} {...props}>
       <CardHeader>
-        <CardTitle>稀奇古怪的东西</CardTitle>
+        <CardTitle>回忆碎片</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-5">
         <CarouselCom />
       </CardContent>
       <CardFooter>
-        <Button className="w-full">联系购买</Button>
+        <Button className="w-full">查看回忆</Button>
       </CardFooter>
     </Card>
   );

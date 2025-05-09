@@ -2,7 +2,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { CardCom } from "@/components/card-com";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-//import { HomePage } from "@/page/home-page";
+import { HomePage } from "@/page/home-page";
 import { SearchPage } from "@/page/search-page";
 import { SettingsPage } from "@/page/settings-page";
 import { ChatPage } from "@/page/chat-page";
@@ -22,6 +22,7 @@ export function ResizableCom() {
                 <Routes>
                   {/* <Route path="/" element={<HomePage />} /> */}
                   <Route path="/" element={<SearchPage />} />
+                  <Route path="/publish" element={<HomePage />} />
                   <Route path="/calendar" element={<ChatPage />} />
                   <Route path="/settings" element={<SettingsPage />} />
                 </Routes>
