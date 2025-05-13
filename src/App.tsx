@@ -8,6 +8,7 @@ import { RegisterForm } from "@/components/register-com";
 import { UserProvider } from "@/common/user-context";
 import { useState } from "react";
 import { ToasterProvider } from "@/components/toaster-com";
+import { BrowserRouter as Router } from "react-router-dom";
 
 function App() {
   const user = UserProvider();
@@ -42,7 +43,11 @@ function App() {
     );
   }
 
-  return <ResizableCom />;
+  return (
+    <Router>
+      <ResizableCom />
+    </Router>
+  );
 }
 
 export default function AppWrapper() {

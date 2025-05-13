@@ -164,7 +164,7 @@ export function ChatCard() {
   }, []);
 
   return (
-    <Card className="max-h-[80vh] flex flex-col">
+    <Card className="max-h-[80vh] flex flex-col w-full shadow-lg">
       {/* 头部 */}
       <CardHeader>
         <CardTitle>ICU Chat</CardTitle>
