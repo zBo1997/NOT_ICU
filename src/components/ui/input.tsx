@@ -6,7 +6,7 @@ const Input = React.forwardRef<
   HTMLInputElement | HTMLTextAreaElement,
   React.ComponentProps<"input"> &
     React.ComponentProps<"textarea"> & { multiline?: boolean }
->(({ className, type, multiline = false, ...props }, ref) => {
+>(({ className, type, multiline = false, onChange, ...props }, ref) => {
   if (multiline) {
     return (
       <textarea
@@ -15,6 +15,7 @@ const Input = React.forwardRef<
           className
         )}
         ref={ref as React.Ref<HTMLTextAreaElement>}
+        onChange={onChange as React.ChangeEventHandler<HTMLTextAreaElement>} // 类型断言
         {...props}
       />
     );
@@ -28,6 +29,7 @@ const Input = React.forwardRef<
         className
       )}
       ref={ref as React.Ref<HTMLInputElement>}
+      onChange={onChange as React.ChangeEventHandler<HTMLInputElement>} // 类型断言
       {...props}
     />
   );

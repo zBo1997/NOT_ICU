@@ -26,13 +26,6 @@ export function PublishCom() {
     { value: "pineapple", label: "Pineapple" },
   ];
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImagePreview(URL.createObjectURL(file)); // 生成图片预览 URL
-    }
-  };
-
   const handleLabelChange = (value: string) => {
     console.log("选中的值是：", value);
     setTags(value);
@@ -51,11 +44,11 @@ export function PublishCom() {
     setContent("");
     setTags("");
     setImageUrl("");
-    setImagePreview(""); // 清空预览
+    setImagePreview("");
   };
 
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-center bg-gray-50 dark:bg-gray-900">
       <Card className="w-full p-6 shadow-lg">
         {/* 头部 */}
         <CardHeader>
@@ -66,53 +59,64 @@ export function PublishCom() {
 
         {/* 消息内容区域 */}
         <CardContent className="flex flex-col gap-4">
-          {/* 图片上传*/}
-
-          {/* 标题和标签 */}
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="grid gap-2">
-              <Label htmlFor="title">标题</Label>
-              <Input
-                id="title"
-                type="text"
-                placeholder="请输入标题"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="w-full"
-                required
-              />
-            </div>
-            <div className="grid gap-2 md:col-span-1">
-              <Label htmlFor="tags">标签</Label>
-              <LabelCom
-                items={items}
-                placeholder="请选择水果"
-                value={tags}
-                onChange={handleLabelChange}
-                className="w-full"
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="imageUpload">上传图片</Label>
-              <Input
-                id="imageUpload"
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-              />
-            </div>
-          </div>
-
-          <div className="grid gap-2">
-            {imagePreview && (
-              <div className="mt-4">
-                <img
-                  src={imagePreview}
-                  alt="预览"
-                  className="w-full max-h-60 object-cover rounded"
+          {/* 标题、标签、上传图片 和 图片预览 */}
+          <div className="grid gap-4 md:grid-cols-2">
+            {/* 左侧：标题、标签、上传图片 */}
+            <div className="flex flex-col gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="title">标题</Label>
+                <Input
+                  id="title"
+                  type="text"
+                  placeholder="请输入标题"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="w-full"
+                  required
                 />
               </div>
-            )}
+              <div className="grid gap-2">
+                <Label htmlFor="tags">标签</Label>
+                <LabelCom
+                  items={items}
+                  placeholder="请选择水果"
+                  value={tags}
+                  onChange={handleLabelChange}
+                  className="w-full"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="imageUpload">封面</Label>
+                <Input
+                  id="imageUpload"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = (e.target as HTMLInputElement).files?.[0];
+                    if (file) {
+                      setImagePreview(URL.createObjectURL(file)); // 生成图片预览 URL
+                    }
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* 右侧：图片预览 */}
+            <div className="flex items-center justify-center">
+              {imagePreview ? (
+                <div className="rounded-lg overflow-hidden relative w-full h-40 md:h-full border border-gray-200 shadow-sm">
+                  <img
+                    src={imagePreview}
+                    alt="预览"
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="flex items-center justify-center w-full h-full border border-gray-200 rounded-lg text-gray-500">
+                  无封面
+                </div>
+              )}
+            </div>
           </div>
 
           {/* 内容输入 */}
@@ -120,11 +124,11 @@ export function PublishCom() {
             <Label htmlFor="content">内容</Label>
             <Input
               id="content"
-              multiline // 启用多行输入
+              multiline
               placeholder="请输入内容"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="h-40" // 设置固定高度
+              className="w-full h-40"
               required
             />
           </div>
