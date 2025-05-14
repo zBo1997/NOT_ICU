@@ -8,23 +8,44 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
+import { useState, useEffect } from "react";
 import { LabelCom } from "@/components/label-com";
+import { get } from "@/utils/request"; // 引入你的请求工具类
+import { toast } from "sonner"; // 引入 sonner 库 提示
+
+interface Tags {
+  ID: string; // 文章ID
+  CreatedAt: string; // 文章标题
+  UpdatedAt: string; // 文章内容
+  DeletedAt: string; // 文章图片
+  title: string; // 作者名称
+  userId?: string; // 作者头像
+}
 
 export function PublishCom() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [tags, setTags] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [items, setItems] = useState<{ value: string; label: string }[]>([]); // 标签选项
   const [imagePreview, setImagePreview] = useState<string | null>(null); // 图片预览 URL
-
-  const items = [
-    { value: "apple", label: "Apple" },
-    { value: "banana", label: "Banana" },
-    { value: "blueberry", label: "Blueberry" },
-    { value: "grapes", label: "Grapes" },
-    { value: "pineapple", label: "Pineapple" },
-  ];
+  const [tags, setTags] = useState<string>(""); // 当前选中的标签
+  // 获取标签
+  const getTags = async () => {
+    try {
+      const response = await get<Tags[]>("/tags");
+      if (response) {
+        // 将标签数据转换为 LabelCom 需要的格式
+        const formattedItems = response.data.map((item) => ({
+          value: item.ID.toString(),
+          label: item.title,
+        }));
+        setItems(formattedItems); // 设置标签选项
+      }
+    } catch (error) {
+      console.error("获取标签失败：", error);
+    }
+  };
 
   const handleLabelChange = (value: string) => {
     console.log("选中的值是：", value);
@@ -33,22 +54,28 @@ export function PublishCom() {
 
   const handleSubmit = () => {
     if (!title.trim() || !content.trim()) {
-      alert("标题和内容不能为空！");
+      toast("标题和内容不能为空！");
       return;
     }
 
     // 模拟提交逻辑
     console.log("发布的文章：", { title, tags, content, imageUrl });
-    alert("文章已成功发布！");
+    toast("文章已成功发布！");
+    // 重置所有状态，包括封面图片
     setTitle("");
     setContent("");
     setTags("");
-    setImageUrl("");
-    setImagePreview("");
+    setImageUrl(""); // 清空封面图片的 URL
+    setImagePreview(null); // 清空图片预览
   };
 
+  // 页面加载时获取标签
+  useEffect(() => {
+    getTags();
+  }, []);
+
   return (
-    <div className="flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+    <div className="flex bg-gray-50 dark:bg-gray-900">
       <Card className="w-full p-6 shadow-lg">
         {/* 头部 */}
         <CardHeader>
@@ -68,7 +95,7 @@ export function PublishCom() {
                 <Input
                   id="title"
                   type="text"
-                  placeholder="请输入标题"
+                  placeholder="请输入回忆标题"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   className="w-full"
@@ -79,7 +106,7 @@ export function PublishCom() {
                 <Label htmlFor="tags">标签</Label>
                 <LabelCom
                   items={items}
-                  placeholder="请选择水果"
+                  placeholder="请选择文章标签"
                   value={tags}
                   onChange={handleLabelChange}
                   className="w-full"
@@ -87,17 +114,30 @@ export function PublishCom() {
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="imageUpload">封面</Label>
-                <Input
-                  id="imageUpload"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = (e.target as HTMLInputElement).files?.[0];
-                    if (file) {
-                      setImagePreview(URL.createObjectURL(file)); // 生成图片预览 URL
+                <div>
+                  {/* 自定义上传按钮 */}
+                  <Button
+                    type="button"
+                    onClick={() =>
+                      document.getElementById("imageUpload")?.click()
                     }
-                  }}
-                />
+                  >
+                    上传图片
+                  </Button>
+                  {/* 隐藏默认文件选择框 */}
+                  <input
+                    id="imageUpload"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = (e.target as HTMLInputElement).files?.[0];
+                      if (file) {
+                        setImagePreview(URL.createObjectURL(file)); // 生成图片预览 URL
+                      }
+                    }}
+                    className="hidden" // 使用 Tailwind 的隐藏样式
+                  />
+                </div>
               </div>
             </div>
 
@@ -122,15 +162,7 @@ export function PublishCom() {
           {/* 内容输入 */}
           <div className="grid gap-2">
             <Label htmlFor="content">内容</Label>
-            <Input
-              id="content"
-              multiline
-              placeholder="请输入内容"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              className="w-full h-40"
-              required
-            />
+            <Textarea placeholder="请输入你的回忆" />
           </div>
         </CardContent>
 
