@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useState, useEffect } from "react";
 import { LabelCom } from "@/components/label-com";
-import { get } from "@/utils/request"; // 引入你的请求工具类
+import { get, postFormData, post } from "@/utils/request"; // 引入你的请求工具类
 import { toast } from "sonner"; // 引入 sonner 库 提示
 
 interface Tags {
@@ -30,6 +30,42 @@ export function PublishCom() {
   const [items, setItems] = useState<{ value: string; label: string }[]>([]); // 标签选项
   const [imagePreview, setImagePreview] = useState<string | null>(null); // 图片预览 URL
   const [tags, setTags] = useState<string>(""); // 当前选中的标签
+
+  // 处理头像上传（使用 axios 工具类进行文件上传）
+  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      // 使用 axios 发送文件上传请求
+      postFormData<{ filekey: string }>("/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data", // 设置为表单数据类型
+          Authorization: `${
+            JSON.parse(localStorage.getItem("user") || "{}").token
+          }`,
+        },
+      })
+        .then((response) => {
+          const fileKey = response.data.filekey; // 上传成功后返回的文件 key
+          console.log("上传成功：" + fileKey);
+
+          // 设置图片 URL 和预览
+          const uploadedImageUrl = `/${fileKey}`; // 假设文件存储在 /uploads 路径下
+          setImageUrl(uploadedImageUrl); // 设置图片 URL
+          setImagePreview(URL.createObjectURL(file)); // 设置图片预览
+          toast("图片上传成功！");
+        })
+        .catch((error) => {
+          console.error("头像上传失败", error);
+        })
+        .finally(() => {
+          console.log("上传完成");
+        });
+    }
+  };
+
   // 获取标签
   const getTags = async () => {
     try {
@@ -52,7 +88,7 @@ export function PublishCom() {
     setTags(value);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!title.trim() || !content.trim()) {
       toast("标题和内容不能为空！");
       return;
@@ -60,13 +96,36 @@ export function PublishCom() {
 
     // 模拟提交逻辑
     console.log("发布的文章：", { title, tags, content, imageUrl });
-    toast("文章已成功发布！");
+
+    try {
+      const response = await post<{
+        error: string;
+      }>("login", {
+        title,
+        tags,
+        content,
+        imageUrl,
+      });
+      if (response.data.error) {
+        toast(response.data.error);
+        return;
+      } else {
+        localStorage.setItem("user", JSON.stringify(response.data));
+        window.location.reload();
+      }
+    } catch (error) {
+      toast("服务器出小差了");
+      console.error(error);
+      return;
+    }
+
     // 重置所有状态，包括封面图片
     setTitle("");
     setContent("");
     setTags("");
     setImageUrl(""); // 清空封面图片的 URL
     setImagePreview(null); // 清空图片预览
+    toast("文章已成功发布！");
   };
 
   // 页面加载时获取标签
@@ -129,12 +188,7 @@ export function PublishCom() {
                     id="imageUpload"
                     type="file"
                     accept="image/*"
-                    onChange={(e) => {
-                      const file = (e.target as HTMLInputElement).files?.[0];
-                      if (file) {
-                        setImagePreview(URL.createObjectURL(file)); // 生成图片预览 URL
-                      }
-                    }}
+                    onChange={handleUpload}
                     className="hidden" // 使用 Tailwind 的隐藏样式
                   />
                 </div>
@@ -162,7 +216,11 @@ export function PublishCom() {
           {/* 内容输入 */}
           <div className="grid gap-2">
             <Label htmlFor="content">内容</Label>
-            <Textarea placeholder="请输入你的回忆" />
+            <Textarea
+              placeholder="请输入你的回忆"
+              onChange={(e) => setContent(e.target.value)}
+              value={content}
+            />
           </div>
         </CardContent>
 

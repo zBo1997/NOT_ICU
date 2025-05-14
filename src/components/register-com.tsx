@@ -81,7 +81,6 @@ export function RegisterForm({
     try {
       const response = await post<{
         error: string;
-        errorContent: string;
       }>("register", {
         name,
         password,
