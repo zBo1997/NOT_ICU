@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/sheet";
 import { AvatarCom } from "@/components/avatar-com";
 import { MarkdownContentComp } from "@/components/markdown-com";
+import { Skeleton } from "@/components/ui/skeleton";
 import axios from "axios";
 import { formatDistanceToNow } from "date-fns"; // 用于格式化时间
 import { zhCN } from "date-fns/locale"; // 中文本地化
@@ -30,6 +31,7 @@ interface Article {
   name: string; // 作者名称
   avatarUrl?: string; // 作者头像
   TagNames: string[]; // 标签名称数组
+  imageKey: string; // 标签名称数组
 }
 
 // 展示评论的类型
@@ -78,10 +80,11 @@ export function SheetCom({ articleId }: CardProps) {
 
         // 获取文章详情
         const response = await get<Article>(`/article/${articleId}`);
-        if (!response.data.images) {
-          response.data.images = [
-            "https://pic.rmb.bdstatic.com/bjh/news/b8b14a82230fd71763b347baca0efb9d.jpeg@h_1280",
-          ];
+        if (response.data.imageKey) {
+          response.data.images = [response.data.imageKey];
+        } else {
+          console.log("文章详情", response.data.imageKey);
+          response.data.images = ["17399493345829518345670.jpg"];
         }
         setArticle(response.data);
 
@@ -89,7 +92,9 @@ export function SheetCom({ articleId }: CardProps) {
         const commentsResponse = await get<DisplayComment[]>(
           `/comments/${articleId}`
         );
-        setComments(commentsResponse.data);
+        if (commentsResponse.data.length > 0) {
+          setComments(commentsResponse.data);
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -185,13 +190,18 @@ export function SheetCom({ articleId }: CardProps) {
 
             {article?.images && article.images.length > 0 && (
               <div className="mt-4 flex justify-center">
+                <Skeleton className="relative w-full h-40" />
                 {article.images.map((image: string, index: number) => (
                   <img
                     key={index}
                     //如果没有图片展示默认图片
-                    src={image}
+                    src={`https://theta.icu/files/${image}`}
                     alt={`文章图片 ${index + 1}`}
-                    className="object-cover rounded-md cursor-pointer"
+                    className="object-cover rounded-md cursor-pointer opacity-0"
+                    onLoad={(e) => {
+                      // 图片加载完成后显示图片
+                      (e.target as HTMLImageElement).style.opacity = "1";
+                    }}
                     onClick={() => handleImageClick(image)}
                   />
                 ))}
@@ -209,7 +219,7 @@ export function SheetCom({ articleId }: CardProps) {
               <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
                 <div className="relative max-w-3xl max-h-[90vh] w-full h-full flex justify-center items-center">
                   <img
-                    src={currentImage}
+                    src={`https://theta.icu/files/${currentImage}`}
                     alt="图片预览"
                     className="w-full h-full object-contain"
                   />

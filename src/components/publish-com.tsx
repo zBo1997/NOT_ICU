@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useState, useEffect } from "react";
 import { LabelCom } from "@/components/label-com";
 import { get, postFormData, post } from "@/utils/request"; // 引入你的请求工具类
+import { useNavigate } from "react-router-dom"; // 引入 useNavigate
 import { toast } from "sonner"; // 引入 sonner 库 提示
 
 interface Tags {
@@ -26,10 +27,11 @@ interface Tags {
 export function PublishCom() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [imageKey, setImagekey] = useState("");
   const [items, setItems] = useState<{ value: string; label: string }[]>([]); // 标签选项
   const [imagePreview, setImagePreview] = useState<string | null>(null); // 图片预览 URL
   const [tags, setTags] = useState<string>(""); // 当前选中的标签
+  const navigate = useNavigate(); // 初始化 useNavigate 钩子
 
   // 处理头像上传（使用 axios 工具类进行文件上传）
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,10 +52,7 @@ export function PublishCom() {
         .then((response) => {
           const fileKey = response.data.filekey; // 上传成功后返回的文件 key
           console.log("上传成功：" + fileKey);
-
-          // 设置图片 URL 和预览
-          const uploadedImageUrl = `/${fileKey}`; // 假设文件存储在 /uploads 路径下
-          setImageUrl(uploadedImageUrl); // 设置图片 URL
+          setImagekey(fileKey); // 设置图片 URL
           setImagePreview(URL.createObjectURL(file)); // 设置图片预览
           toast("图片上传成功！");
         })
@@ -94,24 +93,31 @@ export function PublishCom() {
       return;
     }
 
+    if (!tags.trim()) {
+      toast("请选择标签！");
+      return;
+    }
+
     // 模拟提交逻辑
-    console.log("发布的文章：", { title, tags, content, imageUrl });
+    console.log("发布的文章：", { title, tags, content, imageUrl: imageKey });
 
     try {
       const response = await post<{
         error: string;
-      }>("login", {
-        title,
-        tags,
-        content,
-        imageUrl,
+      }>("/article/pulish", {
+        title: title,
+        //转换为number
+        tags: Number(tags),
+        content: content,
+        imageKey: imageKey,
       });
+
+      //路由到首页
       if (response.data.error) {
         toast(response.data.error);
-        return;
       } else {
-        localStorage.setItem("user", JSON.stringify(response.data));
-        window.location.reload();
+        toast("文章发布成功！");
+        navigate("/"); // 跳转到首页
       }
     } catch (error) {
       toast("服务器出小差了");
@@ -123,9 +129,8 @@ export function PublishCom() {
     setTitle("");
     setContent("");
     setTags("");
-    setImageUrl(""); // 清空封面图片的 URL
+    setImagekey(""); // 清空封面图片的 URL
     setImagePreview(null); // 清空图片预览
-    toast("文章已成功发布！");
   };
 
   // 页面加载时获取标签
@@ -232,7 +237,7 @@ export function PublishCom() {
               setTitle("");
               setContent("");
               setTags("");
-              setImageUrl("");
+              setImagekey("");
               setImagePreview(""); // 清空预览
             }}
           >
