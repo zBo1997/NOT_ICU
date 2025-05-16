@@ -13,30 +13,26 @@ export function ResizableCom() {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <main className="flex flex-grow flex-col">
+      <main className="flex flex-1 flex-col min-h-0">
         <SidebarTrigger />
-        <div className="flex flex-1">
-          {/* 使用 Grid 创建响应式布局 */}
-          <div className="flex flex-1 flex-col lg:flex-row">
-            {/* 第一列: 一直展示 */}
-            <div className="flex-1">
+        <div className="flex flex-1 min-h-0">
+          {/* 主内容和侧边卡片响应式布局 */}
+          <div className="flex flex-1 flex-col lg:flex-row min-h-0">
+            {/* 主内容区 */}
+            <div className="flex-1 min-h-0 overflow-auto">
               <Routes>
-                {/* <Route path="/" element={<HomePage />} /> */}
                 <Route path="/" element={<SearchPage />} />
                 <Route path="/publish" element={<HomePage />} />
                 <Route path="/calendar" element={<ChatPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
               </Routes>
             </div>
-            {/* 第二列: 包含 CalendarCom */}
-            <div className="flex justify-end">
-              {/* 只在非 /publish 路由下显示 CardCom */}
-              {location.pathname !== "/publish" && (
-                <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end p-10">
-                  <CardCom />
-                </div>
-              )}
-            </div>
+            {/* 卡片区 */}
+            {location.pathname !== "/publish" && (
+              <div className="hidden lg:flex lg:items-center lg:justify-end p-10">
+                <CardCom />
+              </div>
+            )}
           </div>
         </div>
       </main>

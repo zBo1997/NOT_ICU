@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 
 interface TypingTextProps {
-  texts: string[]; // 文案数组
-  typingSpeed?: number; // 每个字的显示间隔时间（毫秒）
-  switchDelay?: number; // 切换到下一个文案的延迟时间（毫秒）
-  className?: string; // 自定义样式类名
+  texts: string; // 只接收一个文案
+  typingSpeed?: number;
+  switchDelay?: number;
+  className?: string;
+  onTypingEnd?: () => void;
 }
 
 export const TypingText: React.FC<TypingTextProps> = ({
@@ -12,42 +13,36 @@ export const TypingText: React.FC<TypingTextProps> = ({
   typingSpeed = 150,
   switchDelay = 3000,
   className = "",
+  onTypingEnd,
 }) => {
-  const [displayedText, setDisplayedText] = useState(""); // 当前显示的文本
-  const [currentIndex, setCurrentIndex] = useState(0); // 当前文案索引
+  const [displayedText, setDisplayedText] = useState("");
 
   useEffect(() => {
-    if (!texts[currentIndex]) return; // 如果当前文案无效，直接返回
+    if (!texts) return;
 
-    let index = 0;
-    const fullTextArray = Array.from(texts[currentIndex]); // 当前文案字符数组
-
-    // 重置文本内容
     setDisplayedText("");
+    let index = 0;
+    const fullTextArray = Array.from(texts);
 
-    // 定时器逐字显示当前文案
     const typingInterval = setInterval(() => {
       if (index < fullTextArray.length) {
-        setDisplayedText(fullTextArray.slice(0, index + 1).join("")); // 使用切片确保正确显示字符
+        setDisplayedText(fullTextArray.slice(0, index + 1).join(""));
         index++;
       } else {
-        clearInterval(typingInterval); // 清除逐字显示定时器
+        clearInterval(typingInterval);
+        // 输入完成后延迟 switchDelay 触发回调
+        if (onTypingEnd) {
+          setTimeout(() => {
+            onTypingEnd();
+          }, switchDelay);
+        }
       }
     }, typingSpeed);
 
-    // 切换到下一个文案
-    const switchInterval = setTimeout(
-      () => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % texts.length); // 循环切换文案
-      },
-      fullTextArray.length * typingSpeed + switchDelay
-    );
-
     return () => {
-      clearInterval(typingInterval); // 清理逐字显示定时器
-      clearTimeout(switchInterval); // 清理切换文案定时器
+      clearInterval(typingInterval);
     };
-  }, [currentIndex, texts, typingSpeed, switchDelay]);
+  }, [texts, typingSpeed, switchDelay, onTypingEnd]);
 
   return (
     <span className={`typing-text ${className}`}>

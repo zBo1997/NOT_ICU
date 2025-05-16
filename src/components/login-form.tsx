@@ -7,20 +7,11 @@ import { useRef, useEffect, useState } from "react";
 import { post, get } from "@/utils/request"; // 引入刚刚写的请求工具类
 import { toast } from "sonner"; // 引入 sonner 库 提示
 import { ModeToggle } from "@/components/mode-toggle";
-import { TypingText } from "@/components/typing-com"; // 引入封装的 TypingText 组件
 export function LoginForm({
   className,
   register,
   ...props
 }: React.ComponentProps<"div"> & { register: () => void }) {
-  // 文案数组
-  const texts = [
-    "最美的不是下雨天,是曾与你躲过雨的屋檐。",
-    "弹指岁月倾城顷刻间烟灭，青石板街回眸一笑你婉约。‌‌",
-    "冷咖啡离开了杯垫，我忍住的情绪在很后面，拼命想挽回的从前，在我脸上依旧清晰可见。",
-    "我爱你有种左灯右行的冲突，疯狂却怕没有退路。",
-  ];
-
   // 使用 ref 来获取输入框值
   const usernameRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
@@ -105,12 +96,6 @@ export function LoginForm({
 
   return (
     <div className={cn("flex flex-col gap-5", className)} {...props}>
-      <TypingText
-        texts={texts}
-        typingSpeed={150}
-        switchDelay={3000}
-        className="text-center font-medium "
-      />
       <Card className="overflow-hidden">
         <CardContent className="grid p-0 md:grid-cols-2">
           <form className="p-6 md:p-8">

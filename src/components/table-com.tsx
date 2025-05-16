@@ -2,7 +2,6 @@ import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { IdleCardCom } from "./idle-card-com";
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-
 interface Article {
   ID: string;
   CreatedAt: string;
