@@ -11,151 +11,122 @@ import { Button } from "@/components/ui/button";
 
 // 消息类型
 type Message = {
-  id: number; // 消息唯一 ID，数字类型
-  conversationId: string; // 对话 ID，字符串类型
-  type: "text" | "system" | "end"; // 消息类型
-  content: string; // 消息内容
-  is_end: boolean; // 是否结束
-  timestamp: string; // 时间戳
-  sender?: "user" | "system"; // 发送方（可选，用于前端区分）
+  id: number;
+  conversationId: string;
+  type: "text" | "system" | "end";
+  content: string;
+  is_end: boolean;
+  timestamp: string;
+  sender?: "user" | "system";
 };
 
-// 对话类型
+// 会话类型
 type Conversation = {
-  id: string; // 对话 ID
-  messages: Message[]; // 对话中的消息
+  id: string;
+  messages: Message[];
 };
 
 export function ChatCard() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
+
   const msgRef = useRef<HTMLInputElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const eventSourceRef = useRef<EventSource | null>(null); // 用于管理 SSE 连接
+  const eventSourceRef = useRef<EventSource | null>(null);
 
   // 发送消息
-  const sendMessage = async () => {
+  const sendMessage = () => {
     const input = msgRef.current?.value ?? "";
     if (!input.trim()) return;
 
-    // 用户消息
+    // 生成会话ID（如果已有则复用）
+    const conversationId = Date.now().toString();
+
+    // 关闭旧SSE
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+      eventSourceRef.current = null;
+    }
+
+    // 前端先渲染用户消息
     const userMessage: Message = {
-      id: Date.now(), // 使用时间戳作为唯一 ID
-      conversationId: Date.now().toString(), // 使用时间戳作为对话 ID
+      id: Date.now(),
+      conversationId,
       type: "text",
       content: input,
       is_end: false,
       timestamp: new Date().toISOString(),
       sender: "user",
     };
-
-    // 添加消息到对话
-    setConversations((prevConversations) => {
-      const newConversation: Conversation = {
-        id: userMessage.conversationId,
-        messages: [userMessage],
-      };
-      return [...prevConversations, newConversation];
+    setConversations((prev) => {
+      const idx = prev.findIndex((c) => c.id === conversationId);
+      if (idx !== -1) {
+        // 已有会话，追加消息
+        const updated = [...prev];
+        updated[idx].messages.push(userMessage);
+        return updated;
+      } else {
+        // 新会话
+        return [...prev, { id: conversationId, messages: [userMessage] }];
+      }
     });
 
     // 清空输入框
     msgRef.current!.value = "";
 
-    // 关闭当前 SSE 连接
-    if (eventSourceRef.current) {
-      eventSourceRef.current.close();
-      eventSourceRef.current = null;
-    }
-
-    // 通知后端用户发送了新消息
-    try {
-      await fetch("/api/sendMessage", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          conversationId: userMessage.conversationId,
-          content: userMessage.content,
-        }),
-      });
-    } catch (error) {
-      console.error("发送消息失败:", error);
-    }
-
-    // 重新建立 SSE 连接
-    establishSSEConnection(userMessage.conversationId);
-  };
-
-  // 建立 SSE 连接
-  const establishSSEConnection = (conversationId: string) => {
-    if (eventSourceRef.current) {
-      eventSourceRef.current.close();
-      eventSourceRef.current = null;
-    }
-
-    const eventSource = new EventSource(`/api/sse/${conversationId}`);
+    // 新建SSE连接，带参数
+    const url = `/api/sse?conversationId=${conversationId}&content=${encodeURIComponent(
+      input
+    )}&sender=user`;
+    const eventSource = new EventSource(url);
     eventSourceRef.current = eventSource;
 
     eventSource.onmessage = (event) => {
       const newMessage: Message = JSON.parse(event.data);
 
-      // 更新对话
       setConversations((prevConversations) => {
         const updatedConversations = [...prevConversations];
-        const conversationIndex = updatedConversations.findIndex(
+        let conversation = updatedConversations.find(
           (conv) => conv.id === newMessage.conversationId
         );
-
-        if (conversationIndex !== -1) {
-          // 如果对话已存在，更新最后一条消息的内容（流式输出）
-          const lastMessage =
-            updatedConversations[conversationIndex].messages.at(-1);
-          if (
-            lastMessage &&
-            lastMessage.type === "text" &&
-            !lastMessage.is_end
-          ) {
-            lastMessage.content += newMessage.content; // 逐段追加内容
-          } else {
-            // 否则，将新消息添加到对话中
-            updatedConversations[conversationIndex].messages.push(newMessage);
-          }
-        } else {
-          // 如果对话不存在，创建新对话
-          const newConversation: Conversation = {
-            id: newMessage.conversationId,
-            messages: [newMessage],
-          };
-          updatedConversations.push(newConversation);
+        if (!conversation) {
+          conversation = { id: newMessage.conversationId, messages: [] };
+          updatedConversations.push(conversation);
         }
-
+        // 流式内容覆盖
+        const lastMsg = conversation.messages.at(-1);
+        if (
+          lastMsg &&
+          lastMsg.type === "text" &&
+          !lastMsg.is_end &&
+          newMessage.sender === "system"
+        ) {
+          lastMsg.content = newMessage.content; // 追加内容
+        } else {
+          conversation.messages.push(newMessage);
+        }
         return updatedConversations;
       });
 
-      // 如果消息标记为结束，关闭 SSE 连接
+      // 结束关闭SSE
       if (newMessage.is_end) {
-        console.log("对话结束，关闭 SSE 连接");
         eventSource.close();
       }
     };
 
     eventSource.onerror = () => {
-      console.error("SSE connection error");
       eventSource.close();
     };
   };
 
-  // 监听消息变化，滚动到底部
+  // 滚动到底部
   useEffect(() => {
     if (contentRef.current) {
       contentRef.current.scrollTop = contentRef.current.scrollHeight;
     }
   }, [conversations]);
 
-  // 初始化 SSE 连接
+  // 组件卸载时关闭 SSE
   useEffect(() => {
-    // 假设初始对话 ID 为 "init"
-    establishSSEConnection("init");
-
-    // 组件卸载时关闭连接
     return () => {
       if (eventSourceRef.current) {
         eventSourceRef.current.close();
