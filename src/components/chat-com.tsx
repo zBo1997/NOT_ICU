@@ -92,15 +92,14 @@ export function ChatCard() {
           conversation = { id: newMessage.conversationId, messages: [] };
           updatedConversations.push(conversation);
         }
-        // 流式内容覆盖
         const lastMsg = conversation.messages.at(-1);
         if (
           lastMsg &&
           lastMsg.type === "text" &&
           !lastMsg.is_end &&
-          newMessage.sender === "system"
+          lastMsg.sender === "system"
         ) {
-          lastMsg.content = newMessage.content; // 追加内容
+          lastMsg.content = newMessage.content; // 用 =，因为后端是全量内容
         } else {
           conversation.messages.push(newMessage);
         }
@@ -135,14 +134,14 @@ export function ChatCard() {
   }, []);
 
   return (
-    <Card className="max-h-[80vh] flex flex-col w-full shadow-lg">
+    <Card className="h-[80vh] flex flex-col w-full shadow-lg">
       {/* 头部 */}
       <CardHeader>
         <CardTitle>ICU Chat</CardTitle>
       </CardHeader>
 
       {/* 消息内容区域 */}
-      <CardContent ref={contentRef} className="flex-1 overflow-y-auto">
+      <CardContent ref={contentRef} className="flex-1 min-h-0 overflow-y-auto">
         {conversations.map((conversation) => (
           <div key={conversation.id} className="mb-4">
             {conversation.messages.map((message) => (
