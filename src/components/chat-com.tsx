@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import ReactMarkdown from "react-markdown";
 
 // 消息类型
 type Message = {
@@ -158,7 +159,11 @@ export function ChatCard() {
                       : "bg-gray-200 text-black"
                   }`}
                 >
-                  {message.content}
+                  {message.sender === "system" ? (
+                    <ReactMarkdown>{message.content}</ReactMarkdown>
+                  ) : (
+                    message.content
+                  )}
                   <div className="text-xs text-gray-500 mt-1">
                     {new Date(message.timestamp).toLocaleTimeString()}
                   </div>
