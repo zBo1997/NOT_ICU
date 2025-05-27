@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -62,9 +62,16 @@ export function SheetCom({ articleId }: CardProps) {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [currentImage, setCurrentImage] = useState<string>("");
   const [replyTo, setReplyTo] = useState<DisplayComment | null>(null); // 当前正在回复的评论
+  const inputRef = useRef<HTMLInputElement>(null); //输入框
 
   // 获取当前用户id
   const currentUserId = JSON.parse(localStorage.getItem("user") || "{}").id;
+  //获取当前用户头像
+  const currentUserAvatar = JSON.parse(
+    localStorage.getItem("user") || "{}"
+  ).avatar;
+  //获取当前用户名字
+  const currentUserName = JSON.parse(localStorage.getItem("user") || "{}").name;
 
   // 打开预览模态框
   const handleImageClick = (image: string) => {
@@ -115,22 +122,22 @@ export function SheetCom({ articleId }: CardProps) {
     if (commentText.trim()) {
       const newComment: SubmitComment = {
         comment: commentText,
-        parentId: replyTo?.parentId || null, // 如果是回复评论，设置父评论 ID
+        parentId: replyTo?.parentId || replyTo?.ID, // 如果是回复评论，设置父评论 ID
       };
 
       try {
         // 提交评论到后端
-        const response = await post<DisplayComment>(
-          `/comments/add/${articleId}`,
-          {
-            comment: newComment.comment,
-            parentId: newComment.parentId,
-            replyToUserId: replyTo?.userId || null, // 如果是回复评论，设置被回复用户 ID
-          }
-        );
+        await post<DisplayComment>(`/comments/add/${articleId}`, {
+          comment: newComment.comment,
+          parentId: newComment.parentId,
+          replyToUserId: replyTo?.userId || null, // 如果是回复评论，设置被回复用户 ID
+        });
 
-        // 将后端返回的评论对象添加到评论列表
-        setComments([response.data, ...comments]);
+        // 提交成功后，重新获取评论列表
+        const commentsResponse = await get<DisplayComment[]>(
+          `/comments/${articleId}`
+        );
+        setComments(commentsResponse.data || []);
 
         // 清空评论输入框
         setCommentText("");
@@ -169,8 +176,7 @@ export function SheetCom({ articleId }: CardProps) {
   // 递归渲染评论和子评论
   function renderComment(comment: DisplayComment, parentId?: string) {
     // 判断是否为子回复且是自己
-    const isSelfReply =
-      !!comment.parentId && String(comment.userId) === String(currentUserId);
+    const isSelfReply = String(comment.userId) === String(currentUserId);
 
     return (
       <div key={comment.ID} className="flex space-x-4">
@@ -184,10 +190,23 @@ export function SheetCom({ articleId }: CardProps) {
         <div className="flex-1">
           <div className="flex items-center justify-between">
             <p className="font-semibold">
-              {comment.name}
-              {comment.parentName && (
+              {String(comment.userId) === String(currentUserId)
+                ? `我 ( ${comment.name} ):`
+                : comment.name}
+              {comment.replyUserName && (
                 <span className="text-sm text-gray-500 ml-2">
-                  回复 @{comment.replyUserName}
+                  <span
+                    className={
+                      String(comment.replyToUserId) === String(currentUserId)
+                        ? "text-red-700 font-bold"
+                        : ""
+                    }
+                  >
+                    回复 @{" "}
+                    {String(comment.replyToUserId) === String(currentUserId)
+                      ? "你"
+                      : comment.replyUserName}
+                  </span>
                 </span>
               )}
             </p>
@@ -203,7 +222,12 @@ export function SheetCom({ articleId }: CardProps) {
             {/* 只有不是自己对子回复时才显示回复按钮 */}
             {!isSelfReply && (
               <button
-                onClick={() => setReplyTo(comment)}
+                onClick={() => {
+                  setReplyTo(comment);
+                  setTimeout(() => {
+                    inputRef.current?.focus();
+                  }, 0);
+                }}
                 className="text-sm text-blue-500"
               >
                 回复
@@ -311,17 +335,31 @@ export function SheetCom({ articleId }: CardProps) {
             )}
 
             <div className="space-y-6 py-4">
+              {/* 回复提示区域 */}
+              {replyTo && (
+                <div className="mb-2 px-3 py-2 rounded border-l-4 border-blue-400 flex items-center justify-between">
+                  <div>
+                    <span className="font-semibold text-blue-600">
+                      回复 @
+                      {String(replyTo.userId) === String(currentUserId)
+                        ? "我"
+                        : replyTo.name}
+                    </span>
+                    <span className="ml-2 ">{replyTo.comment}</span>
+                  </div>
+                </div>
+              )}
               {/* 评论输入框 */}
               <div className="flex items-center space-x-3">
                 <AvatarCom
                   avatarInfo={{
-                    userName: "当前用户",
-                    avatarUrl:
-                      "https://avatars.githubusercontent.com/u/53822786?s=96&v=4",
+                    userName: currentUserName,
+                    avatarUrl: `https://theta.icu/files/${currentUserAvatar}`,
                   }}
                   size="sm"
                 />
                 <Input
+                  ref={inputRef}
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
                   placeholder={
