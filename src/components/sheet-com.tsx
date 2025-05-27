@@ -233,12 +233,15 @@ export function SheetCom({ articleId }: CardProps) {
                 回复
               </button>
             )}
-            <button
-              onClick={() => handleDeleteComment(comment.ID, parentId)}
-              className="text-sm text-red-500"
-            >
-              删除
-            </button>
+            {/* 只有自己才能删除自己的评论 */}
+            {String(comment.userId) === String(currentUserId) && (
+              <button
+                onClick={() => handleDeleteComment(comment.ID, parentId)}
+                className="text-sm text-red-500"
+              >
+                删除
+              </button>
+            )}
           </div>
           {/* 渲染二级回复 */}
           {comment.replies && comment.replies.length > 0 && (
