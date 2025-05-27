@@ -357,7 +357,7 @@ export function SheetCom({ articleId }: CardProps) {
                 <AvatarCom
                   avatarInfo={{
                     userName: currentUserName,
-                    avatarUrl: `https://theta.icu/files/${currentUserAvatar}`,
+                    avatarUrl: currentUserAvatar,
                   }}
                   size="sm"
                 />
