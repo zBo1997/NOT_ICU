@@ -34,15 +34,18 @@ interface Article {
   imageKey: string; // 标签名称数组
 }
 
-// 展示评论的类型
 interface DisplayComment {
-  ID: string; // 评论ID
-  name: string; // 用户名
-  comment: string; // 评论内容
-  CreatedAt: string; // 创建时间
-  avatarUrl: string; // 用户头像
-  parentId?: string | null; // 父评论ID（可选）
-  parentName?: string | null; // 父评论用户名（可选）
+  ID: string;
+  name: string;
+  comment: string;
+  CreatedAt: string;
+  avatarUrl: string;
+  userId: number | string;
+  parentId?: string | null;
+  parentName?: string | null;
+  replyToUserId?: number | string;
+  replyUserName?: string;
+  replies?: DisplayComment[];
 }
 
 // 提交评论的类型
@@ -60,6 +63,9 @@ export function SheetCom({ articleId }: CardProps) {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [currentImage, setCurrentImage] = useState<string>("");
   const [replyTo, setReplyTo] = useState<DisplayComment | null>(null); // 当前正在回复的评论
+
+  // 获取当前用户id
+  const currentUserId = JSON.parse(localStorage.getItem("user") || "{}").id;
 
   // 打开预览模态框
   const handleImageClick = (image: string) => {
@@ -138,17 +144,88 @@ export function SheetCom({ articleId }: CardProps) {
   };
 
   // 删除评论
-  const handleDeleteComment = async (index: number) => {
-    const commentToDelete = comments[index];
+  const handleDeleteComment = async (commentId: string, parentId?: string) => {
     try {
-      await axios.delete(
-        `/api/comments/${articleId}/comments/${commentToDelete.ID}`
-      );
-      setComments(comments.filter((_, i) => i !== index));
+      await axios.delete(`/api/comments/${articleId}/comments/${commentId}`);
+      if (parentId) {
+        setComments((prev) =>
+          prev.map((c) =>
+            c.ID === parentId
+              ? {
+                  ...c,
+                  replies: (c.replies || []).filter((r) => r.ID !== commentId),
+                }
+              : c
+          )
+        );
+      } else {
+        setComments((prev) => prev.filter((c) => c.ID !== commentId));
+      }
     } catch (error) {
       console.error("Error deleting comment:", error);
     }
   };
+
+  // 递归渲染评论和子评论
+  function renderComment(comment: DisplayComment, parentId?: string) {
+    // 判断是否为子回复且是自己
+    const isSelfReply =
+      !!comment.parentId && String(comment.userId) === String(currentUserId);
+
+    return (
+      <div key={comment.ID} className="flex space-x-4">
+        <AvatarCom
+          avatarInfo={{
+            userName: comment.name,
+            avatarUrl: comment.avatarUrl,
+          }}
+          size="sm"
+        />
+        <div className="flex-1">
+          <div className="flex items-center justify-between">
+            <p className="font-semibold">
+              {comment.name}
+              {comment.parentName && (
+                <span className="text-sm text-gray-500 ml-2">
+                  回复 @{comment.replyUserName}
+                </span>
+              )}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {formatDistanceToNow(new Date(comment.CreatedAt), {
+                locale: zhCN,
+              })}{" "}
+              前
+            </p>
+          </div>
+          <p className="mt-1">{comment.comment}</p>
+          <div className="flex space-x-2 mt-2">
+            {/* 只有不是自己对子回复时才显示回复按钮 */}
+            {!isSelfReply && (
+              <button
+                onClick={() => setReplyTo(comment)}
+                className="text-sm text-blue-500"
+              >
+                回复
+              </button>
+            )}
+            <button
+              onClick={() => handleDeleteComment(comment.ID, parentId)}
+              className="text-sm text-red-500"
+            >
+              删除
+            </button>
+          </div>
+          {/* 渲染二级回复 */}
+          {comment.replies && comment.replies.length > 0 && (
+            <div className="pl-8 mt-2 space-y-2 border-l border-gray-200">
+              {comment.replies.map((reply) => renderComment(reply, comment.ID))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
@@ -269,52 +346,7 @@ export function SheetCom({ articleId }: CardProps) {
 
               {/* 已有评论展示 */}
               <div className="space-y-4 mt-6">
-                {comments.map((comment, index) => (
-                  <div key={comment.ID} className="flex space-x-4">
-                    <AvatarCom
-                      avatarInfo={{
-                        userName: comment.name,
-                        avatarUrl: comment.avatarUrl,
-                      }}
-                      size="sm"
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <p className="font-semibold">
-                          {comment.name}
-                          {comment.parentName && (
-                            <span className="text-sm text-gray-500 ml-2">
-                              回复 @{comment.parentName}
-                            </span>
-                          )}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {formatDistanceToNow(new Date(comment.CreatedAt), {
-                            locale: zhCN,
-                          })}{" "}
-                          前
-                        </p>
-                      </div>
-                      <p className="mt-1">{comment.comment}</p>
-                      <div className="flex space-x-2 mt-2">
-                        <button
-                          onClick={() => {
-                            setReplyTo(comment); // 设置当前回复的评论
-                          }}
-                          className="text-sm text-blue-500"
-                        >
-                          回复
-                        </button>
-                        <button
-                          onClick={() => handleDeleteComment(index)}
-                          className="text-sm text-red-500"
-                        >
-                          删除
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                {comments.map((comment) => renderComment(comment))}
               </div>
             </div>
           </>
