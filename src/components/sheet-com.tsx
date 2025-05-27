@@ -14,10 +14,9 @@ import {
 import { AvatarCom } from "@/components/avatar-com";
 import { MarkdownContentComp } from "@/components/markdown-com";
 import { Skeleton } from "@/components/ui/skeleton";
-import axios from "axios";
 import { formatDistanceToNow } from "date-fns"; // 用于格式化时间
 import { zhCN } from "date-fns/locale"; // 中文本地化
-import { post, get } from "@/utils/request"; // 引入你的请求工具类
+import { post, get, del } from "@/utils/request"; // 引入你的请求工具类
 
 type CardProps = React.ComponentProps<typeof Sheet> & {
   articleId?: string;
@@ -116,7 +115,7 @@ export function SheetCom({ articleId }: CardProps) {
     if (commentText.trim()) {
       const newComment: SubmitComment = {
         comment: commentText,
-        parentId: replyTo?.ID || null, // 如果是回复评论，设置父评论 ID
+        parentId: replyTo?.parentId || null, // 如果是回复评论，设置父评论 ID
       };
 
       try {
@@ -126,6 +125,7 @@ export function SheetCom({ articleId }: CardProps) {
           {
             comment: newComment.comment,
             parentId: newComment.parentId,
+            replyToUserId: replyTo?.userId || null, // 如果是回复评论，设置被回复用户 ID
           }
         );
 
@@ -146,7 +146,7 @@ export function SheetCom({ articleId }: CardProps) {
   // 删除评论
   const handleDeleteComment = async (commentId: string, parentId?: string) => {
     try {
-      await axios.delete(`/api/comments/${articleId}/comments/${commentId}`);
+      await del(`comments/delete/${commentId}`);
       if (parentId) {
         setComments((prev) =>
           prev.map((c) =>
