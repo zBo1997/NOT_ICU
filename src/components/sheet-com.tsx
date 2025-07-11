@@ -16,7 +16,7 @@ import { MarkdownContentComp } from "@/components/markdown-com";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns"; // 用于格式化时间
 import { zhCN } from "date-fns/locale"; // 中文本地化
-import { post, get, del } from "@/utils/request"; // 引入你的请求工具类
+import { post, get, del } from "@/utils/request"; // 引入请求工具类
 
 type CardProps = React.ComponentProps<typeof Sheet> & {
   articleId?: string;

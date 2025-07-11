@@ -9,38 +9,38 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import ReactMarkdown from "react-markdown";
+import { get } from "@/utils/request"; // 引入你的请求工具类
 
 // 消息类型
 type Message = {
-  id: number;
   conversationId: string;
-  type: "text" | "system" | "end";
   content: string;
-  is_end: boolean;
+  sender: "user" | "system";
   timestamp: string;
-  sender?: "user" | "system";
 };
 
-// 会话类型
 type Conversation = {
-  id: string;
+  conversationId: string;
   messages: Message[];
+};
+
+type ConversationId = {
+  conversationId: string;
 };
 
 export function ChatCard() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
-
   const msgRef = useRef<HTMLInputElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
 
   // 发送消息
-  const sendMessage = () => {
+  const sendMessage = async () => {
+    // 获取文章详情
+    const response = await get<ConversationId>(`/generateConversationId`);
+    const conversationId = response.data;
     const input = msgRef.current?.value ?? "";
     if (!input.trim()) return;
-
-    // 生成会话ID（如果已有则复用）
-    const conversationId = Date.now().toString();
 
     // 关闭旧SSE
     if (eventSourceRef.current) {
@@ -48,69 +48,86 @@ export function ChatCard() {
       eventSourceRef.current = null;
     }
 
-    // 前端先渲染用户消息
+    // 创建用户消息
     const userMessage: Message = {
-      id: Date.now(),
-      conversationId,
-      type: "text",
+      conversationId: conversationId.conversationId,
       content: input,
-      is_end: false,
-      timestamp: new Date().toISOString(),
       sender: "user",
+      timestamp: new Date().toISOString(),
     };
+
+    // 更新会话
     setConversations((prev) => {
-      const idx = prev.findIndex((c) => c.id === conversationId);
+      const idx = prev.findIndex(
+        (c) => c.conversationId === conversationId.conversationId
+      );
       if (idx !== -1) {
-        // 已有会话，追加消息
         const updated = [...prev];
         updated[idx].messages.push(userMessage);
         return updated;
       } else {
-        // 新会话
-        return [...prev, { id: conversationId, messages: [userMessage] }];
+        return [
+          ...prev,
+          {
+            conversationId: conversationId.conversationId,
+            messages: [userMessage],
+          },
+        ];
       }
     });
 
-    // 清空输入框
     msgRef.current!.value = "";
 
-    // 新建SSE连接，带参数
-    const url = `/api/sse?conversationId=${conversationId}&content=${encodeURIComponent(
-      input
-    )}&sender=user`;
+    // 新建SSE连接
+    const url = `/api/sse?conversationId=${conversationId.conversationId}&content=${encodeURIComponent(input)}`;
     const eventSource = new EventSource(url);
     eventSourceRef.current = eventSource;
 
     eventSource.onmessage = (event) => {
-      const newMessage: Message = JSON.parse(event.data);
+      const data = JSON.parse(event.data);
 
-      setConversations((prevConversations) => {
-        const updatedConversations = [...prevConversations];
-        let conversation = updatedConversations.find(
-          (conv) => conv.id === newMessage.conversationId
+      setConversations((prev) => {
+        console.log("我被执行了");
+        const updated = [...prev];
+        const idx = updated.findIndex(
+          (c) => c.conversationId === data.conversationId
         );
-        if (!conversation) {
-          conversation = { id: newMessage.conversationId, messages: [] };
-          updatedConversations.push(conversation);
-        }
-        const lastMsg = conversation.messages.at(-1);
-        if (
-          lastMsg &&
-          lastMsg.type === "text" &&
-          !lastMsg.is_end &&
-          lastMsg.sender === "system"
-        ) {
-          lastMsg.content = newMessage.content; // 用 =，因为后端是全量内容
+        if (idx !== -1) {
+          const messages = updated[idx].messages;
+          // 如果最后一条是 system 消息，则拼接
+          if (
+            messages.length > 0 &&
+            messages[messages.length - 1].sender === "system"
+          ) {
+            messages[messages.length - 1].content += data.content;
+          } else {
+            // 否则新增一条 system 消息
+            messages.push({
+              conversationId: data.conversationId,
+              content: data.content,
+              sender: "system",
+              timestamp: new Date().toISOString(),
+            });
+          }
+          return updated;
         } else {
-          conversation.messages.push(newMessage);
+          // 新会话
+          return [
+            ...prev,
+            {
+              conversationId: data.conversationId,
+              messages: [
+                {
+                  conversationId: data.conversationId,
+                  content: data.content,
+                  sender: "system",
+                  timestamp: new Date().toISOString(),
+                },
+              ],
+            },
+          ];
         }
-        return updatedConversations;
       });
-
-      // 结束关闭SSE
-      if (newMessage.is_end) {
-        eventSource.close();
-      }
     };
 
     eventSource.onerror = () => {
@@ -118,14 +135,12 @@ export function ChatCard() {
     };
   };
 
-  // 滚动到底部
   useEffect(() => {
     if (contentRef.current) {
       contentRef.current.scrollTop = contentRef.current.scrollHeight;
     }
   }, [conversations]);
 
-  // 组件卸载时关闭 SSE
   useEffect(() => {
     return () => {
       if (eventSourceRef.current) {
@@ -136,21 +151,16 @@ export function ChatCard() {
 
   return (
     <Card className="h-[80vh] flex flex-col w-full shadow-lg">
-      {/* 头部 */}
       <CardHeader>
         <CardTitle>ICU Chat</CardTitle>
       </CardHeader>
-
-      {/* 消息内容区域 */}
       <CardContent ref={contentRef} className="flex-1 min-h-0 overflow-y-auto">
         {conversations.map((conversation) => (
-          <div key={conversation.id} className="mb-4">
+          <div key={conversation.conversationId} className="mb-4">
             {conversation.messages.map((message) => (
               <div
-                key={message.id}
-                className={`flex ${
-                  message.sender === "user" ? "justify-end" : "justify-start"
-                }`}
+                key={message.conversationId}
+                className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
                   className={`px-4 py-2 rounded-lg max-w-[75%] ${
@@ -173,8 +183,6 @@ export function ChatCard() {
           </div>
         ))}
       </CardContent>
-
-      {/* 输入框和按钮 */}
       <CardFooter className="flex space-x-2">
         <Input
           ref={msgRef}

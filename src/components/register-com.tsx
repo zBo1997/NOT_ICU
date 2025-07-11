@@ -152,7 +152,7 @@ export function RegisterForm({
                   </a>
                 </div>
                 <Input
-                  placeholder="请输入你的密码"
+                  placeholder="请输入你的ICU昵称"
                   required
                   ref={nicknameRef} // 使用 ref 来获取值
                 />
