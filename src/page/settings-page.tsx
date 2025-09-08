@@ -7,7 +7,9 @@ export function SettingsPage() {
   return (
     <div className="p-10">
       {/* 页面标题 */}
-      <div className="text-3xl font-semibold tracking-tight mb-6">个人信息</div>
+      <div className="text-3xl font-semibold tracking-tight mb-6">
+        I want to live for myself · [我想为自己而活。]
+      </div>
       <InfoCardCom user={user}>
         {/* 其他部分 */}
         <div className="mt-12 space-y-4">
@@ -20,7 +22,6 @@ export function SettingsPage() {
           </div>
         </div>
 
-        {/* 你可以继续添加其他个人信息卡片 */}
         <div className="mt-12 space-y-4">
           <div className="bg-white shadow-md rounded-xl p-6">
             <h3 className="text-xl font-semibold text-gray-800">其他信息</h3>

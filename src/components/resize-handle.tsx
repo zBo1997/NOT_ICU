@@ -1,14 +1,14 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
-import { CardCom } from "@/components/card-com";
-import { Routes, Route, useLocation } from "react-router-dom";
+// import { CardCom } from "@/components/card-com";
+import { Routes, Route } from "react-router-dom";
 import { HomePage } from "@/page/home-page";
 import { SearchPage } from "@/page/search-page";
 import { SettingsPage } from "@/page/settings-page";
 import { ChatPage } from "@/page/chat-page";
 
 export function ResizableCom() {
-  const location = useLocation();
+  // const location = useLocation();
 
   return (
     <SidebarProvider>
@@ -28,11 +28,11 @@ export function ResizableCom() {
               </Routes>
             </div>
             {/* 卡片区 */}
-            {location.pathname !== "/publish" && (
+            {/* {location.pathname !== "/publish" && (
               <div className="hidden lg:flex lg:items-center lg:justify-end p-10">
                 <CardCom />
               </div>
-            )}
+            )} */}
           </div>
         </div>
       </main>

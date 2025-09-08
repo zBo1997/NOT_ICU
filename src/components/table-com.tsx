@@ -62,7 +62,7 @@ export function TableCom() {
 
   return (
     <div
-      className="overflow-y-auto max-h-[650px]"
+      className="overflow-y-auto max-h-[650vh]"
       style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
     >
       <Table>

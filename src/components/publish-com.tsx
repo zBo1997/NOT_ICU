@@ -140,7 +140,7 @@ export function PublishCom() {
 
   return (
     <div className="flex bg-gray-50 dark:bg-gray-900">
-      <Card className="w-full p-6 shadow-lg">
+      <Card className="h-[80vh] flex flex-col w-full shadow-lg">
         {/* 头部 */}
         <CardHeader>
           <div className="text-2xl font-bold text-gray-800 dark:text-gray-100">

@@ -12,7 +12,7 @@ export function InfoCardCom({
   children: React.ReactNode;
 }) {
   return (
-    <Card className="flex flex-col  bg-gradient-to-r shadow-lg rounded-lg overflow-hidden">
+    <Card className="h-[80vh] flex flex-col w-full shadow-lg">
       <CardContent className="w-full p-6">
         {/* 个人信息卡片 */}
         <div>

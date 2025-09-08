@@ -20,22 +20,22 @@ import { UserProvider } from "@/common/user-context";
 // Menu items.
 const items = [
   {
-    title: "回忆房间",
+    title: "Panic",
     url: "/",
     icon: Home,
   },
   {
-    title: "记录回忆",
+    title: "Record",
     url: "/publish",
     icon: Search,
   },
   {
-    title: "诠释",
+    title: "Explain",
     url: "/calendar",
     icon: ChatBubbleIcon,
   },
   {
-    title: "释怀",
+    title: "Who am I ?",
     url: "/settings",
     icon: Settings,
   },
