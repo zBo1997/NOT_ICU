@@ -20,7 +20,7 @@ interface Tags {
   CreatedAt: string; // 文章标题
   UpdatedAt: string; // 文章内容
   DeletedAt: string; // 文章图片
-  title: string; // 作者名称
+  tag: string; // 作者名称
   userId?: string; // 作者头像
 }
 
@@ -28,7 +28,7 @@ export function PublishCom() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [imageKey, setImagekey] = useState("");
-  const [items, setItems] = useState<{ value: string; label: string }[]>([]); // 标签选项
+  const [items, setItems] = useState<Tags[]>([]); // 标签选项
   const [imagePreview, setImagePreview] = useState<string | null>(null); // 图片预览 URL
   const [tags, setTags] = useState<string>(""); // 当前选中的标签
   const navigate = useNavigate(); // 初始化 useNavigate 钩子
@@ -57,7 +57,7 @@ export function PublishCom() {
           toast("图片上传成功！");
         })
         .catch((error) => {
-          console.error("头像上传失败", error);
+          console.error("上传失败", error);
         })
         .finally(() => {
           console.log("上传完成");
@@ -70,12 +70,7 @@ export function PublishCom() {
     try {
       const response = await get<Tags[]>("/tags");
       if (response) {
-        // 将标签数据转换为 LabelCom 需要的格式
-        const formattedItems = response.data.map((item) => ({
-          value: item.ID.toString(),
-          label: item.title,
-        }));
-        setItems(formattedItems); // 设置标签选项
+        setItems(response.data);
       }
     } catch (error) {
       console.error("获取标签失败：", error);
@@ -171,7 +166,6 @@ export function PublishCom() {
                 <LabelCom
                   items={items}
                   placeholder="请选择文章标签"
-                  value={tags}
                   onChange={handleLabelChange}
                   className="w-full"
                 />

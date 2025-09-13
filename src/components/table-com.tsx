@@ -1,7 +1,7 @@
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { IdleCardCom } from "./idle-card-com";
 import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import { get } from "@/utils/request"; // 引入你的请求工具类
 
 interface ImageKey {
   CreatedAt: string;
@@ -11,6 +11,12 @@ interface ImageKey {
   imageKey: string;
   UpdatedAt: string;
   sortOrder: number;
+}
+
+interface PageArticle {
+  hasMore: false;
+  items: Article[];
+  total: number;
 }
 
 interface Article {
@@ -28,26 +34,25 @@ interface Article {
 const PAGE_SIZE = 5;
 
 export function TableCom() {
-  const [article, setArticle] = useState<Article[]>([]);
+  const [article, setArticle] = useState<Article[] | null>(null);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [total, setTotal] = useState(-1);
+  const [total, setTotal] = useState<number>(-1);
   const hasMore = React.useRef<HTMLDivElement>(null);
 
   const fetchArticle = useCallback(async () => {
     // 判断是否还有更多数据
-    if (loading || (page > total / PAGE_SIZE && total != -1)) return;
+    if (loading || (page > total / PAGE_SIZE && total !== -1)) return;
     setLoading(true);
-
     try {
-      const response = await axios.get(`/api/pageArticle`, {
+      const response = await get<PageArticle>(`/pageArticle`, {
         params: {
           page,
           pageSize: PAGE_SIZE,
         },
       });
-      setArticle((prev) => [...prev, ...response.data.items]);
-      setPage((prev) => prev + 1);
+      setArticle((prev) => [...(prev || []), ...response.data.items]);
+      setPage(page + 1);
       setTotal(response.data.total);
     } catch (error) {
       console.error("Error fetching article:", error);
@@ -70,7 +75,7 @@ export function TableCom() {
         ob.unobserve(currentHasMore);
       }
     };
-  });
+  }, [fetchArticle]);
 
   return (
     <div
@@ -79,7 +84,7 @@ export function TableCom() {
     >
       <Table>
         <TableBody>
-          {article.map((notification, index) => (
+          {article?.map((notification, index) => (
             <TableRow key={`${notification.ID}-${index}`}>
               <TableCell className="font-medium">
                 <IdleCardCom article={notification} />
