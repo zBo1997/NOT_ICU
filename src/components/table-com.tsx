@@ -2,15 +2,27 @@ import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { IdleCardCom } from "./idle-card-com";
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
+
+interface ImageKey {
+  CreatedAt: string;
+  ID: number;
+  articleId: string;
+  caption: string;
+  imageKey: string;
+  UpdatedAt: string;
+  sortOrder: number;
+}
+
 interface Article {
-  ID: string;
+  ID: number;
   CreatedAt: string;
   title: string;
   content: string;
-  userId: string;
+  userId: number;
   avatarUrl: string;
   name: string;
-  TagNames: string[];
+  tagNames: string[];
+  imageKeys: ImageKey[];
 }
 
 const PAGE_SIZE = 5;
@@ -78,7 +90,7 @@ export function TableCom() {
       </Table>
       <div ref={hasMore}>
         {loading && <div className="py-4 text-center">加载中...</div>}
-        {hasMore && <div className="py-4 text-center">---我是有底线的---</div>}
+        {hasMore && <div className="py-4 text-center">---快他妈别翻了---</div>}
       </div>
     </div>
   );

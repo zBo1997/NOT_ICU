@@ -27,7 +27,7 @@ export function CardCom({
   ...props
 }: CardProps) {
   return (
-    <Card className={cn("w-[380px]", className)} {...props}>
+    <Card className={cn("w-[380vh]", className)} {...props}>
       {/* 条件渲染头部 */}
       {(header || title) && (
         <CardHeader>
@@ -36,14 +36,13 @@ export function CardCom({
         </CardHeader>
       )}
 
-      <CardContent className="grid gap-5">
+      <CardContent>
         <CarouselCom />
       </CardContent>
 
       {/* 条件渲染底部 */}
       {(footer || footerContent) && (
         <CardFooter>
-          {footerContent}
           <Button className="w-full">{buttonName}</Button>
         </CardFooter>
       )}

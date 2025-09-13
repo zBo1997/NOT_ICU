@@ -12,25 +12,25 @@ import {
 } from "@/components/ui/sheet";
 import { AvatarCom } from "@/components/avatar-com";
 import { MarkdownContentComp } from "@/components/markdown-com";
-import { Skeleton } from "@/components/ui/skeleton";
+// import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
 import { zhCN } from "date-fns/locale";
 import { post, get, del } from "@/utils/request";
 
 type CardProps = {
-  articleId?: string;
+  articleId?: number;
   onOpenChange?: (open: boolean) => void;
 };
 
 interface Article {
-  ID: string;
+  ID: number;
   title: string;
   content: string;
   images: string[];
   name: string;
   avatarUrl?: string;
   TagNames?: string[];
-  imageKey?: string;
+  // imageKey?: string;
 }
 
 interface DisplayComment {
@@ -64,8 +64,8 @@ export const SheetCom = forwardRef<SheetComRef, CardProps>(
     const [article, setArticle] = useState<Article | null>(null);
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-    const [currentImage, setCurrentImage] = useState<string>("");
+    // const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+    // const [currentImage, setCurrentImage] = useState<string>("");
     const [replyTo, setReplyTo] = useState<DisplayComment | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -90,7 +90,7 @@ export const SheetCom = forwardRef<SheetComRef, CardProps>(
         setLoading(true);
         const response = await get<Article>(`/article/${articleId}`);
         const a = response.data;
-        a.images = a.imageKey ? [a.imageKey] : ["17399493345829518345670.jpg"];
+        // a.images = a.imageKey ? [a.imageKey] : ["17399493345829518345670.jpg"];
         setArticle(a);
 
         const commentsResponse = await get<DisplayComment[]>(
@@ -104,11 +104,11 @@ export const SheetCom = forwardRef<SheetComRef, CardProps>(
       }
     };
 
-    const handleImageClick = (image: string) => {
-      setCurrentImage(image);
-      setIsPreviewOpen(true);
-    };
-    const handleClosePreview = () => setIsPreviewOpen(false);
+    // const handleImageClick = (image: string) => {
+    //   setCurrentImage(image);
+    //   setIsPreviewOpen(true);
+    // };
+    // const handleClosePreview = () => setIsPreviewOpen(false);
 
     const handleCommentSubmit = async () => {
       if (!commentText.trim() || !articleId) return;
@@ -281,7 +281,7 @@ export const SheetCom = forwardRef<SheetComRef, CardProps>(
                 </SheetDescription>
               </SheetHeader>
 
-              {!!article?.images?.length && (
+              {/* {!!article?.images?.length && (
                 <div className="mt-4 flex justify-center">
                   <Skeleton className="relative w-full h-40" />
                   {article.images.map((image, index) => (
@@ -297,14 +297,14 @@ export const SheetCom = forwardRef<SheetComRef, CardProps>(
                     />
                   ))}
                 </div>
-              )}
+              )} */}
 
               <div className="mt-4">
                 <MarkdownContentComp markdownContent={article?.content || ""} />
               </div>
 
               {/* 预览模态框 */}
-              {isPreviewOpen && (
+              {/* {isPreviewOpen && (
                 <div className="fixed inset-0 bg-black/75 flex justify-center items-center z-50">
                   <div className="relative max-w-3xl max-h-[90vh] w-full h-full flex justify-center items-center">
                     <img
@@ -320,7 +320,7 @@ export const SheetCom = forwardRef<SheetComRef, CardProps>(
                     </button>
                   </div>
                 </div>
-              )}
+              )} */}
 
               {/* 评论区 */}
               <div className="space-y-6 py-4">

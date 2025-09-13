@@ -7,21 +7,32 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { CarouselCom } from "./carouse-com";
 import { SheetCom } from "./sheet-com";
 import { format } from "date-fns";
-import { CardCom } from "./card-com";
 import { useRef, useState } from "react";
 
-type Article = {
-  ID: string;
+interface ImageKey {
+  CreatedAt: string;
+  ID: number;
+  articleId: string;
+  caption: string;
+  imageKey: string;
+  UpdatedAt: string;
+  sortOrder: number;
+}
+
+interface Article {
+  ID: number;
   CreatedAt: string;
   title: string;
   content: string;
+  userId: number;
   avatarUrl: string;
   name: string;
-  userId: string;
-  TagNames: string[];
-};
+  tagNames: string[];
+  imageKeys: ImageKey[];
+}
 
 type CardProps = React.ComponentProps<typeof Card> & {
   article?: Article;
@@ -82,8 +93,14 @@ export function IdleCardCom({ className, article, ...props }: CardProps) {
       </CardHeader>
 
       <CardContent className="pt-4 pb-6">
+        {/* 外层容器：保持响应式布局，仅调整内部元素顺序和占比 */}
         <div className="flex flex-col md:flex-row gap-6">
-          {/* 左侧：标题、内容和标签 */}
+          {/* 左侧：轮播图（调整为第一个子元素） */}
+          <div className="w-full md:w-2/5 relative overflow-hidden rounded-lg border border-border shadow-sm transition-transform hover:scale-[1.02]">
+            <CarouselCom data={article?.imageKeys} />
+          </div>
+
+          {/* 右侧：标题、内容和标签（调整为第二个子元素） */}
           <div className="w-full md:w-3/5 space-y-4">
             <div className="space-y-2">
               <h3 className="text-xl font-bold text-foreground/90 hover:text-foreground transition-colors cursor-pointer">
@@ -95,9 +112,9 @@ export function IdleCardCom({ className, article, ...props }: CardProps) {
             </div>
 
             {/* 标签区域 */}
-            {article?.TagNames && article.TagNames.length > 0 && (
+            {article?.tagNames && article.tagNames.length > 0 && (
               <div className="flex flex-wrap gap-2 pt-2">
-                {article.TagNames.map((tag) => (
+                {article.tagNames.map((tag) => (
                   <span
                     key={tag}
                     className="px-2.5 py-0.5 bg-secondary/80 hover:bg-secondary text-secondary-foreground rounded-full text-xs transition-colors"
@@ -107,11 +124,6 @@ export function IdleCardCom({ className, article, ...props }: CardProps) {
                 ))}
               </div>
             )}
-          </div>
-
-          {/* 右侧：轮播图 */}
-          <div className="w-full md:w-2/5 h-[180px] relative overflow-hidden rounded-lg border border-border shadow-sm transition-transform hover:scale-[1.02]">
-            <CardCom className="w-full h-full object-cover" />
           </div>
         </div>
       </CardContent>
