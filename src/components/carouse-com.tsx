@@ -63,7 +63,7 @@ export function CarouselCom({ data = [] }: CarouselComProps) {
               <Card className="h-full border-none shadow-none">
                 <CardContent className="p-0 h-full m-0">
                   <img
-                    src={item.imageKey}
+                    src={`https://theta.icu/files/${item.imageKey}`}
                     alt={`slide-${idx}`}
                     className="max-w-full max-h-full object-contain"
                   />
